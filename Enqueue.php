@@ -28,6 +28,7 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * WordPress Script and Style enqueuing class.
  *
+ * @version 1.0.0
  * @author Glynn Quelch <glynn.quelch@gmail.com>
  */
 class Enqueue {
