@@ -21,7 +21,7 @@
 
 namespace PinkCrab\Modules\Enqueue;
 
-if ( ! defined( 'WPINC' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	die;
 }
 
@@ -231,6 +231,11 @@ class Enqueue {
 	 */
 	private function does_file_exist( string $url ): bool {
 		$ch = curl_init( $url );
+
+		if ( ! $ch ) {
+			return false;
+		}
+
 		curl_setopt( $ch, CURLOPT_NOBODY, true );
 		curl_setopt( $ch, CURLOPT_TIMEOUT_MS, 50 );
 		curl_exec( $ch );
@@ -318,10 +323,10 @@ class Enqueue {
 				$this->footer
 			);
 			if ( $this->does_file_exist( $this->src ) ) {
-				wp_add_inline_script( $this->handle, file_get_contents( $this->src ) );
+				wp_add_inline_script( $this->handle, file_get_contents( $this->src ) ?: '' );
 			}
 		} else {
-			$r = wp_register_script(
+			wp_register_script(
 				$this->handle,
 				$this->src,
 				$this->deps,
@@ -329,7 +334,6 @@ class Enqueue {
 				$this->footer
 			);
 
-			
 		}
 
 		if ( ! empty( $this->localize ) ) {
@@ -337,5 +341,23 @@ class Enqueue {
 		}
 
 		wp_enqueue_script( $this->handle );
+	}
+
+	/**
+	 * Denotes if the scripts is for admin use.
+	 *
+	 * @return bool
+	 */
+	public function is_admin(): bool {
+		return $this->admin;
+	}
+
+	/**
+	 * Denotes if the scripts is for frontend use.
+	 *
+	 * @return bool
+	 */
+	public function is_front(): bool {
+		return $this->front;
 	}
 }
