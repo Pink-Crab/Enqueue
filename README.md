@@ -1,6 +1,6 @@
 # PinkCrab Enqueue #
 
-![alt text](https://img.shields.io/badge/PHPStan-level%207-brightgreen.svg?style=flat " ")
+![alt text](https://img.shields.io/badge/PHPStan-level%208-brightgreen.svg?style=flat " ")
 
 The PinkCrab Enqueue calss allows for a clean and chainable alternative for enqueuing scripts and styles in WordPress.
 
