@@ -183,7 +183,6 @@ class Enqueue {
 	 */
 	public function lastest_version(): self {
 		if ( $this->does_file_exist( $this->src ) ) {
-			// dump(get_headers( $this->src, 1 ));
 
 			$headers = get_headers( $this->src, 1 );
 
@@ -223,6 +222,16 @@ class Enqueue {
 	 */
 	public function footer( bool $footer = true ): self {
 		$this->footer = $footer;
+		return $this;
+	}
+
+	/**
+	 * Alias for footerfalse
+	 *
+	 * @return self
+	 */
+	public function header(): self {
+		$this->footer = false;
 		return $this;
 	}
 
@@ -269,7 +278,7 @@ class Enqueue {
 	 * @return void
 	 */
 	private function register_style() {
-		wp_enqueue_style(
+		\wp_enqueue_style(
 			$this->handle,
 			$this->src,
 			$this->deps,
@@ -286,7 +295,7 @@ class Enqueue {
 	private function register_script() {
 
 		if ( $this->inline ) {
-			wp_register_script(
+			\wp_register_script(
 				$this->handle,
 				'',
 				$this->deps,
@@ -294,10 +303,10 @@ class Enqueue {
 				$this->footer
 			);
 			if ( $this->does_file_exist( $this->src ) ) {
-				wp_add_inline_script( $this->handle, file_get_contents( $this->src ) ?: '' );
+				\wp_add_inline_script( $this->handle, file_get_contents( $this->src ) ?: '' );
 			}
 		} else {
-			$r = wp_register_script(
+			wp_register_script(
 				$this->handle,
 				$this->src,
 				$this->deps,
@@ -307,9 +316,9 @@ class Enqueue {
 		}
 
 		if ( ! empty( $this->localize ) ) {
-			wp_localize_script( $this->handle, $this->handle, $this->localize );
+			\wp_localize_script( $this->handle, $this->handle, $this->localize );
 		}
 
-		wp_enqueue_script( $this->handle );
+		\wp_enqueue_script( $this->handle );
 	}
 }
