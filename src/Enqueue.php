@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  * A chainable helper class for enqueuing scripts and styles.
  *
@@ -16,19 +19,15 @@
  *
  * @author Glynn Quelch <glynn.quelch@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
- * @package PinkCrab\Modules\Enqueue
+ * @package PinkCrab\Enqueue
  */
 
-namespace PinkCrab\Modules\Enqueue;
-
-if ( ! defined( 'WPINC' ) ) {
-	die;
-}
+namespace PinkCrab\Enqueue;
 
 /**
  * WordPress Script and Style enqueuing class.
  *
- * @version 1.0.0
+ * @version 1.1.0
  * @author Glynn Quelch <glynn.quelch@gmail.com>
  */
 class Enqueue {
@@ -58,7 +57,7 @@ class Enqueue {
 	/**
 	 * Dependencies which must be loaded prior.
 	 *
-	 * @var array
+	 * @var array<int, string>
 	 */
 	protected $deps = array();
 
@@ -79,9 +78,9 @@ class Enqueue {
 	/**
 	 * Values to be localized when script enqueued.
 	 *
-	 * @var array|null
+	 * @var array<string, mixed>|null
 	 */
-	protected $localize;
+	protected $localize = null;
 
 	/**
 	 * Defines if script should be parsed inline or enqueued.
@@ -99,19 +98,6 @@ class Enqueue {
 	 */
 	protected $media = 'all';
 
-	/**
-	 * If file should be loaded on the front end.
-	 *
-	 * @var boolean
-	 */
-	protected $front = true;
-
-	/**
-	 * Defines if file should be loaded in wp-admin
-	 *
-	 * @var boolean
-	 */
-	protected $admin = false;
 
 
 	/**
@@ -143,28 +129,6 @@ class Enqueue {
 	 */
 	public static function style( string $handle ): self {
 		return new self( $handle, 'style' );
-	}
-
-	/**
-	 * Enqueue in wp-admin (ajax/rest)
-	 *
-	 * @param boolean $admin
-	 * @return self
-	 */
-	public function admin( bool $admin = true ): self {
-		$this->admin = $admin;
-		return $this;
-	}
-
-	/**
-	 * Enqueue in frontend only.
-	 *
-	 * @param boolean $front
-	 * @return self
-	 */
-	public function front( bool $front = true ): self {
-		$this->front = $front;
-		return $this;
 	}
 
 	/**
@@ -213,12 +177,20 @@ class Enqueue {
 
 	/**
 	 * Sets the version as last modified file time.
+	 * Doesnt set the version if the fileheader can be read.
 	 *
 	 * @return self
 	 */
 	public function lastest_version(): self {
 		if ( $this->does_file_exist( $this->src ) ) {
-			$this->ver = strtotime( get_headers( $this->src, 1 )['Last-Modified'] );
+
+			$headers = get_headers( $this->src, 1 );
+
+			if ( is_array( $headers )
+			&& array_key_exists( 'Last-Modified', $headers )
+			) {
+				$this->ver = strtotime( $headers['Last-Modified'] );
+			}
 		}
 		return $this;
 	}
@@ -231,6 +203,9 @@ class Enqueue {
 	 */
 	private function does_file_exist( string $url ): bool {
 		$ch = curl_init( $url );
+		if ( ! $ch ) {
+			return false;
+		}
 		curl_setopt( $ch, CURLOPT_NOBODY, true );
 		curl_setopt( $ch, CURLOPT_TIMEOUT_MS, 50 );
 		curl_exec( $ch );
@@ -251,6 +226,16 @@ class Enqueue {
 	}
 
 	/**
+	 * Alias for footerfalse
+	 *
+	 * @return self
+	 */
+	public function header(): self {
+		$this->footer = false;
+		return $this;
+	}
+
+	/**
 	 * Should the script be called in the inline.
 	 *
 	 * @param boolean $inline
@@ -264,7 +249,7 @@ class Enqueue {
 	/**
 	 * Pass any key => value pairs to be localised with the enqueue.
 	 *
-	 * @param array $args
+	 * @param array<string, mixed> $args
 	 * @return self
 	 */
 	public function localize( array $args ): self {
@@ -293,7 +278,7 @@ class Enqueue {
 	 * @return void
 	 */
 	private function register_style() {
-		wp_enqueue_style(
+		\wp_enqueue_style(
 			$this->handle,
 			$this->src,
 			$this->deps,
@@ -310,7 +295,7 @@ class Enqueue {
 	private function register_script() {
 
 		if ( $this->inline ) {
-			wp_register_script(
+			\wp_register_script(
 				$this->handle,
 				'',
 				$this->deps,
@@ -318,24 +303,22 @@ class Enqueue {
 				$this->footer
 			);
 			if ( $this->does_file_exist( $this->src ) ) {
-				wp_add_inline_script( $this->handle, file_get_contents( $this->src ) );
+				\wp_add_inline_script( $this->handle, file_get_contents( $this->src ) ?: '' );
 			}
 		} else {
-			$r = wp_register_script(
+			wp_register_script(
 				$this->handle,
 				$this->src,
 				$this->deps,
 				$this->ver,
 				$this->footer
 			);
-
-			
 		}
 
 		if ( ! empty( $this->localize ) ) {
-			wp_localize_script( $this->handle, $this->handle, $this->localize );
+			\wp_localize_script( $this->handle, $this->handle, $this->localize );
 		}
 
-		wp_enqueue_script( $this->handle );
+		\wp_enqueue_script( $this->handle );
 	}
 }
