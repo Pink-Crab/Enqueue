@@ -9,7 +9,7 @@ https://app.gitbook.com/@glynn-quelch/s/pinkcrab/~/drafts/-MQX_cCgS6Q37RjFODUp/
 
 To install 
 ```bash
-composer install pinkcrab/enqueue
+composer require pinkcrab/enqueue
 ```
 
 
