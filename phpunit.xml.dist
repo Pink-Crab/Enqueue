@@ -13,7 +13,14 @@
         </testsuite>
     </testsuites>
 
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">./src/</directory>
+        </whitelist>
+    </filter>
+
     <php>
         <env name="WP_PHPUNIT__TESTS_CONFIG" value="tests/wp-config.php" />
+        <ini name="memory_limit" value="512M" />
     </php>
 </phpunit>

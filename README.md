@@ -1,19 +1,20 @@
 # PinkCrab Enqueue #
 
-![alt text](https://img.shields.io/badge/PHPStan-level%208-brightgreen.svg?style=flat " ")
+![alt text](https://img.shields.io/badge/Current_Version-0.1.0-yellow.svg?style=flat " ") 
+[![Open Source Love](https://badges.frapsoft.com/os/mit/mit.svg?v=102)]()
+![](https://github.com/Pink-Crab/Perique-Route/workflows/GitHub_CI/badge.svg " ")
+[![codecov](https://codecov.io/gh/Pink-Crab/Enqueue/branch/master/graph/badge.svg?token=9O27LAKVWI)](https://codecov.io/gh/Pink-Crab/Enqueue) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Pink-Crab/Enqueue/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Pink-Crab/Enqueue/?branch=master)
 
-The PinkCrab Enqueue calss allows for a clean and chainable alternative for enqueuing scripts and styles in WordPress.
+
+The PinkCrab Enqueue class allows for a clean and fluent alternative for enqueuing scripts and styles in WordPress.
 
 To install 
 ```bash
 composer require pinkcrab/enqueue
 ```
 
-
 ## Version ##
-**Release 1.1.0**
-
-** At present this class doesnt support BC in regards named properties in PHP8. Argument names may change, although we have made this so most methods take a single or no properites at all. **
+**Release 1.2.0**
 
 
 
@@ -178,6 +179,55 @@ Enqueue::style('my_style')
     ->register();
 
 ```
+### Attributes ###
+It is possible (since v1.2.0) to add attributes and flags (value free attributes) to either script or style tags.
+```php
+<?php
+Enqueue::style('my_style')
+    ->src('http://www.site.com/my-style.css')
+    ->attribute('key', 'value')
+    ->register();
+
+// Rendered as
+// <link href="[.css/bootstrap.min.css](http://www.site.com/my-style.css)" rel="stylesheet" type="text/css" key="value">
+```
+or
+
+```php
+<?php
+Enqueue::script('my_style')
+    ->src('http://www.site.com/my-scripts.js')
+    ->flag('key')
+    ->register();
+
+// Rendered as
+// <script src="http://www.site.com/my-scripts.js" key type="text/javascript"></script>
+```
+### Async & Defer ###
+There is also some shortcuts for making any script or style be defered or async tagged.
+```php
+<?php
+Enqueue::style('my_style')
+    ->src('http://www.site.com/my-style.css')
+    ->async()
+    ->register();
+
+// Rendered as
+// <link href="[.css/bootstrap.min.css](http://www.site.com/my-style.css)" rel="stylesheet" type="text/css" async="">
+```
+or
+
+```php
+<?php
+Enqueue::script('my_style')
+    ->src('http://www.site.com/my-scripts.js')
+    ->defer()
+    ->register();
+
+// Rendered as
+// <script src="http://www.site.com/my-scripts.js" defer="" type="text/javascript"></script>
+```
+
 ### Registration  ###
 Once your Enqueue object has been populted all you need to call **register()** for wp_enqueue_script() or wp_enqueue_style() to be called. You can either do all this inline (like the first example) or the Enqueue object can be populated and only called when required.
 
@@ -313,14 +363,50 @@ add_action('wp_loaded', [new My_Thingy, 'init']);
    public function localize( array $args ): self
 
    /**
+	 * Adds a Flag (attribute with no value) to a script/style tag
+	 *
+	 * @param string $flag
+	 * @return self
+	 */
+	public function flag( string $flag ): self 
+
+	/**
+	 * Adds an attribute tto a script/style tag
+	 *
+	 * @param string $key
+	 * @param string $value
+	 * @return self
+	 */
+	public function attribute( string $key, string $value ): self 
+
+	/**
+	 * Marks the script or style as deferred loaded.
+	 *
+	 * @return self
+	 */
+	public function defer(): self 
+
+	/**
+	 * Marks the script or style as async loaded.
+	 *
+	 * @return self
+	 */
+	public function async(): self 
+
+   /**
     * Registers the file as either enqueued or inline parsed.
     *
     * @return void
     */
    public function register(): void
 
+   
+
 ```
 This obviously can be passed around between different classes/functions
+
+### Changelog ###
+* 1.2.0 : Added in Attribute and Flag support with helpers for Aysnc and Defer 
 
 ### Contributions  ###
 If you would like to make any suggestions or contributions to this little class, please feel free to submit a pull request or reach out to speak to me. at glynn@pinkcrab.co.uk.

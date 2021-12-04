@@ -30,12 +30,22 @@ define( 'WP_DEBUG', true );
 // WARNING WARNING WARNING!
 // These tests will DROP ALL TABLES in the database with the prefix named below.
 // DO NOT use a production database or one that is shared with something else.
-define( 'DB_NAME', getenv( 'WP_DB_NAME' ) ?: 'pc_core_tests' );
-define( 'DB_USER', getenv( 'WP_DB_USER' ) ?: 'root' );
-define( 'DB_PASSWORD', getenv( 'WP_DB_PASS' ) ?: '' );
-define( 'DB_HOST', '127.0.0.1' );
-define( 'DB_CHARSET', 'utf8' );
-define( 'DB_COLLATE', '' );
+if ( getenv( 'environment_github' ) ) {
+	define( 'DB_NAME', 'pc_core_tests' );
+	define( 'DB_USER', 'root' );
+	define( 'DB_PASSWORD', 'crab' );
+	define( 'DB_HOST', '0.0.0.0' );
+	define( 'DB_CHARSET', 'utf8' );
+	define( 'DB_COLLATE', '' );
+} else {
+	// IF YOU ARE PLANNING TO RUN THESE TESTS, SET THESE TO MATCH YOUR DB.
+	define( 'DB_NAME', getenv( 'WP_DB_NAME' ) ?: 'pc_core_tests' );
+	define( 'DB_USER', getenv( 'WP_DB_USER' ) ?: 'root' );
+	define( 'DB_PASSWORD', getenv( 'WP_DB_PASS' ) ?: '' );
+	define( 'DB_HOST', '127.0.0.1' );
+	define( 'DB_CHARSET', 'utf8' );
+	define( 'DB_COLLATE', '' );
+}
 
 /**#@+
  * Authentication Unique Keys and Salts.

@@ -14,8 +14,7 @@ namespace PinkCrab\Core\Tests\Application;
 
 use WP_UnitTestCase;
 use PinkCrab\Enqueue\Enqueue;
-use PinkCrab\PHPUnit_Helpers\Output;
-use PinkCrab\PHPUnit_Helpers\Objects;
+use Gin0115\WPUnit_Helpers\Objects;
 
 class Test_Enqueue extends WP_UnitTestCase {
 
@@ -64,8 +63,8 @@ class Test_Enqueue extends WP_UnitTestCase {
 	 */
 	public function test_can_create_from_constructor(): void {
 		$enqueue = new Enqueue( 'hook', 'script' );
-		$this->assertEquals( 'hook', Objects::get_private_property( $enqueue, 'handle' ) );
-		$this->assertEquals( 'script', Objects::get_private_property( $enqueue, 'type' ) );
+		$this->assertEquals( 'hook', Objects::get_property( $enqueue, 'handle' ) );
+		$this->assertEquals( 'script', Objects::get_property( $enqueue, 'type' ) );
 	}
 
 	/**
@@ -75,12 +74,12 @@ class Test_Enqueue extends WP_UnitTestCase {
 	 */
 	public function test_static_constructors(): void {
 		$script = self::create_script();
-		$this->assertEquals( 'script_handle', Objects::get_private_property( $script, 'handle' ) );
-		$this->assertEquals( 'script', Objects::get_private_property( $script, 'type' ) );
+		$this->assertEquals( 'script_handle', Objects::get_property( $script, 'handle' ) );
+		$this->assertEquals( 'script', Objects::get_property( $script, 'type' ) );
 
 		$style = self::create_style();
-		$this->assertEquals( 'style_handle', Objects::get_private_property( $style, 'handle' ) );
-		$this->assertEquals( 'style', Objects::get_private_property( $style, 'type' ) );
+		$this->assertEquals( 'style_handle', Objects::get_property( $style, 'handle' ) );
+		$this->assertEquals( 'style', Objects::get_property( $style, 'type' ) );
 	}
 
 	/**
@@ -92,20 +91,20 @@ class Test_Enqueue extends WP_UnitTestCase {
 
 		$script = self::create_script();
 
-		$this->assertEquals( 'script', Objects::get_private_property( $script, 'type' ) );
-		$this->assertEquals( 'script_handle', Objects::get_private_property( $script, 'handle' ) );
-		$this->assertEquals( 'https://url.com/Fixtures/script_file.js', Objects::get_private_property( $script, 'src' ) );
-		$this->assertEquals( '1.2.3', Objects::get_private_property( $script, 'ver' ) );
-		$this->assertFalse( Objects::get_private_property( $script, 'footer' ) );
+		$this->assertEquals( 'script', Objects::get_property( $script, 'type' ) );
+		$this->assertEquals( 'script_handle', Objects::get_property( $script, 'handle' ) );
+		$this->assertEquals( 'https://url.com/Fixtures/script_file.js', Objects::get_property( $script, 'src' ) );
+		$this->assertEquals( '1.2.3', Objects::get_property( $script, 'ver' ) );
+		$this->assertFalse( Objects::get_property( $script, 'footer' ) );
 
-		$this->assertIsArray( Objects::get_private_property( $script, 'deps' ) );
-		$this->assertEquals( 'jquery', Objects::get_private_property( $script, 'deps' )[0] );
-		$this->assertEquals( 'angularjs', Objects::get_private_property( $script, 'deps' )[1] );
+		$this->assertIsArray( Objects::get_property( $script, 'deps' ) );
+		$this->assertEquals( 'jquery', Objects::get_property( $script, 'deps' )[0] );
+		$this->assertEquals( 'angularjs', Objects::get_property( $script, 'deps' )[1] );
 
-		$this->assertIsArray( Objects::get_private_property( $script, 'localize' ) );
-		$this->assertArrayHasKey( 'key_int', Objects::get_private_property( $script, 'localize' ) );
-		$this->assertIsInt( Objects::get_private_property( $script, 'localize' )['key_int'] );
-		$this->assertIsArray( Objects::get_private_property( $script, 'localize' )['key_array'] );
+		$this->assertIsArray( Objects::get_property( $script, 'localize' ) );
+		$this->assertArrayHasKey( 'key_int', Objects::get_property( $script, 'localize' ) );
+		$this->assertIsInt( Objects::get_property( $script, 'localize' )['key_int'] );
+		$this->assertIsArray( Objects::get_property( $script, 'localize' )['key_array'] );
 
 	}
 
@@ -118,54 +117,85 @@ class Test_Enqueue extends WP_UnitTestCase {
 
 		$style = self::create_style();
 
-		$this->assertEquals( 'style', Objects::get_private_property( $style, 'type' ) );
-		$this->assertEquals( 'style_handle', Objects::get_private_property( $style, 'handle' ) );
-		$this->assertEquals( 'style_file.css', Objects::get_private_property( $style, 'src' ) );
-		$this->assertEquals( '2.3', Objects::get_private_property( $style, 'ver' ) );
-		$this->assertEquals( '(orientation: portrait)', Objects::get_private_property( $style, 'media' ) );
+		$this->assertEquals( 'style', Objects::get_property( $style, 'type' ) );
+		$this->assertEquals( 'style_handle', Objects::get_property( $style, 'handle' ) );
+		$this->assertEquals( 'style_file.css', Objects::get_property( $style, 'src' ) );
+		$this->assertEquals( '2.3', Objects::get_property( $style, 'ver' ) );
+		$this->assertEquals( '(orientation: portrait)', Objects::get_property( $style, 'media' ) );
 
-		$this->assertIsArray( Objects::get_private_property( $style, 'deps' ) );
-		$this->assertEquals( 'theme_styles', Objects::get_private_property( $style, 'deps' )[0] );
-		$this->assertEquals( 'ache_plugin_styles', Objects::get_private_property( $style, 'deps' )[1] );
+		$this->assertIsArray( Objects::get_property( $style, 'deps' ) );
+		$this->assertEquals( 'theme_styles', Objects::get_property( $style, 'deps' )[0] );
+		$this->assertEquals( 'ache_plugin_styles', Objects::get_property( $style, 'deps' )[1] );
 
 	}
 
-	/**
-	 * Test that the scripts/styles are added on regiser()
-	 *
-	 * @return void
-	 */
-	public function test_is_add_to_enqueue_stack(): void {
-		// Not inlined and in footer
-		$script = self::create_script()->footer();
-		$script->register();
+	/** @testdox It should be possible to denote a scriptas async easily. */
+	public function test_can_set_async_on_script(): void {
+		$script = self::create_script()->async();
 
-		$this->assertArrayHasKey( 'script_handle', $GLOBALS['wp_scripts']->registered );
-		$dependency = $GLOBALS['wp_scripts']->registered['script_handle'];
-
-		$this->assertEquals( 'script_handle', $dependency->handle );
-		$this->assertEquals( 'https://url.com/Fixtures/script_file.js', $dependency->src );
-		$this->assertEquals( '1.2.3', $dependency->ver );
-
-		$this->assertIsArray( $dependency->deps );
-		$this->assertEquals( 'jquery', $dependency->deps[0] );
-		$this->assertEquals( 'angularjs', $dependency->deps[1] );
-
-		// Localized values.
-		$expected = sprintf(
-			'var %s = %s;',
-			'script_handle',
-			json_encode(
-				(object) array(
-					'key_int'   => '1',
-					'key_array' => array( 'string', 'val' ),
-				)
-			)
-		);
-		$this->assertEquals( $expected, $dependency->extra['data'] );
-
-		// Check is in footer (extra group 1)
-		$this->assertEquals( '1', $dependency->extra['group'] );
+		$attributes = Objects::get_property( $script, 'attributes' );
+		$this->assertArrayHasKey( 'async', $attributes );
 	}
 
+	/** @testdox It should be possible to denote a style as async easily. */
+	public function test_can_set_async_style(): void {
+		$style = self::create_style()->async();
+
+		$attributes = Objects::get_property( $style, 'attributes' );
+		$this->assertArrayHasKey( 'async', $attributes );
+	}
+
+	/** @testdox It should be possible to denote a scriptas defer easily. */
+	public function test_can_set_defer_on_script(): void {
+		$script = self::create_script()->defer();
+
+		$attributes = Objects::get_property( $script, 'attributes' );
+		$this->assertArrayHasKey( 'defer', $attributes );
+	}
+
+	/** @testdox It should be possible to denote a style as defer easily. */
+	public function test_can_set_defer_style(): void {
+		$style = self::create_style()->defer();
+
+		$attributes = Objects::get_property( $style, 'attributes' );
+		$this->assertArrayHasKey( 'defer', $attributes );
+	}
+
+	/** @testdox It should not be possible to set both async and defer, either should unset the other */
+	public function test_can_only_be_async_or_defer(): void {
+		$script     = self::create_script()->async();
+		$attributes = Objects::get_property( $script, 'attributes' );
+		$this->assertArrayHasKey( 'async', $attributes );
+		$this->assertArrayNotHasKey( 'defer', $attributes );
+
+		$script->defer();
+		$attributes = Objects::get_property( $script, 'attributes' );
+		$this->assertArrayHasKey( 'defer', $attributes );
+		$this->assertArrayNotHasKey( 'async', $attributes );
+
+		$script->async();
+		$attributes = Objects::get_property( $script, 'attributes' );
+		$this->assertArrayHasKey( 'async', $attributes );
+		$this->assertArrayNotHasKey( 'defer', $attributes );
+	}
+
+	/** @testdox It should be possible to define if a script is added to the header */
+	public function test_can_set_script_in_header(): void {
+		$script = Enqueue::script( 'header' )->header();
+		$this->assertFalse( Objects::get_property( $script, 'footer' ) );
+	}
+
+	/** @testdox It should be possible to toggle if a script in enqueued inline. */
+	public function test_can_set_script_as_inline(): void {
+		$script = Enqueue::script( 'header' )->inline();
+		$this->assertTrue( Objects::get_property( $script, 'inline' ) );
+
+		// As false
+		$script = Enqueue::script( 'header' )->inline( false );
+		$this->assertFalse( Objects::get_property( $script, 'inline' ) );
+
+		// Verbose true.
+		$script = Enqueue::script( 'header' )->inline( true );
+		$this->assertTrue( Objects::get_property( $script, 'inline' ) );
+	}
 }
