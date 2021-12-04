@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1638639109">
+  <project timestamp="1638639109">
+    <package name="PinkCrab\Enqueue">
+      <file name="/shared/httpd/php/htdocs/pc_modules/Enqueue/src/Enqueue.php">
+        <class name="PinkCrab\Enqueue\Enqueue" namespace="PinkCrab\Enqueue">
+          <metrics complexity="37" methods="21" coveredmethods="14" conditionals="0" coveredconditionals="0" statements="105" coveredstatements="76" elements="126" coveredelements="90"/>
+        </class>
+        <line num="115" type="method" name="__construct" visibility="public" complexity="1" crap="1" count="7"/>
+        <line num="116" type="stmt" count="7"/>
+        <line num="117" type="stmt" count="7"/>
+        <line num="118" type="stmt" count="7"/>
+        <line num="126" type="method" name="script" visibility="public" complexity="1" crap="1" count="5"/>
+        <line num="127" type="stmt" count="5"/>
+        <line num="136" type="method" name="style" visibility="public" complexity="1" crap="1" count="3"/>
+        <line num="137" type="stmt" count="3"/>
+        <line num="146" type="method" name="src" visibility="public" complexity="1" crap="1" count="6"/>
+        <line num="147" type="stmt" count="6"/>
+        <line num="148" type="stmt" count="6"/>
+        <line num="157" type="method" name="deps" visibility="public" complexity="1" crap="1" count="4"/>
+        <line num="158" type="stmt" count="4"/>
+        <line num="159" type="stmt" count="4"/>
+        <line num="168" type="method" name="ver" visibility="public" complexity="1" crap="1" count="6"/>
+        <line num="169" type="stmt" count="6"/>
+        <line num="170" type="stmt" count="6"/>
+        <line num="179" type="method" name="media" visibility="public" complexity="1" crap="1" count="2"/>
+        <line num="180" type="stmt" count="2"/>
+        <line num="181" type="stmt" count="2"/>
+        <line num="190" type="method" name="lastest_version" visibility="public" complexity="4" crap="20.00" count="0"/>
+        <line num="191" type="stmt" count="0"/>
+        <line num="193" type="stmt" count="0"/>
+        <line num="195" type="stmt" count="0"/>
+        <line num="196" type="stmt" count="0"/>
+        <line num="198" type="stmt" count="0"/>
+        <line num="201" type="stmt" count="0"/>
+        <line num="210" type="method" name="does_file_exist" visibility="private" complexity="2" crap="6.00" count="0"/>
+        <line num="211" type="stmt" count="0"/>
+        <line num="212" type="stmt" count="0"/>
+        <line num="213" type="stmt" count="0"/>
+        <line num="215" type="stmt" count="0"/>
+        <line num="216" type="stmt" count="0"/>
+        <line num="217" type="stmt" count="0"/>
+        <line num="218" type="stmt" count="0"/>
+        <line num="219" type="stmt" count="0"/>
+        <line num="220" type="stmt" count="0"/>
+        <line num="229" type="method" name="footer" visibility="public" complexity="1" crap="1" count="5"/>
+        <line num="230" type="stmt" count="5"/>
+        <line num="231" type="stmt" count="5"/>
+        <line num="239" type="method" name="header" visibility="public" complexity="1" crap="2.00" count="0"/>
+        <line num="240" type="stmt" count="0"/>
+        <line num="241" type="stmt" count="0"/>
+        <line num="250" type="method" name="inline" visibility="public" complexity="1" crap="2.00" count="0"/>
+        <line num="251" type="stmt" count="0"/>
+        <line num="252" type="stmt" count="0"/>
+        <line num="261" type="method" name="localize" visibility="public" complexity="1" crap="1" count="3"/>
+        <line num="262" type="stmt" count="3"/>
+        <line num="263" type="stmt" count="3"/>
+        <line num="272" type="method" name="flag" visibility="public" complexity="1" crap="1" count="2"/>
+        <line num="273" type="stmt" count="2"/>
+        <line num="274" type="stmt" count="2"/>
+        <line num="284" type="method" name="attribute" visibility="public" complexity="1" crap="1" count="2"/>
+        <line num="285" type="stmt" count="2"/>
+        <line num="286" type="stmt" count="2"/>
+        <line num="294" type="method" name="register" visibility="public" complexity="3" crap="3" count="3"/>
+        <line num="295" type="stmt" count="3"/>
+        <line num="296" type="stmt" count="3"/>
+        <line num="299" type="stmt" count="3"/>
+        <line num="300" type="stmt" count="1"/>
+        <line num="302" type="stmt" count="3"/>
+        <line num="309" type="method" name="register_style" visibility="private" complexity="1" crap="1" count="1"/>
+        <line num="310" type="stmt" count="1"/>
+        <line num="311" type="stmt" count="1"/>
+        <line num="312" type="stmt" count="1"/>
+        <line num="313" type="stmt" count="1"/>
+        <line num="314" type="stmt" count="1"/>
+        <line num="315" type="stmt" count="1"/>
+        <line num="318" type="stmt" count="1"/>
+        <line num="320" type="stmt" count="1"/>
+        <line num="327" type="method" name="register_script" visibility="private" complexity="5" crap="6.25" count="3"/>
+        <line num="329" type="stmt" count="3"/>
+        <line num="330" type="stmt" count="0"/>
+        <line num="331" type="stmt" count="0"/>
+        <line num="333" type="stmt" count="0"/>
+        <line num="334" type="stmt" count="0"/>
+        <line num="335" type="stmt" count="0"/>
+        <line num="337" type="stmt" count="0"/>
+        <line num="338" type="stmt" count="0"/>
+        <line num="341" type="stmt" count="3"/>
+        <line num="342" type="stmt" count="3"/>
+        <line num="343" type="stmt" count="3"/>
+        <line num="344" type="stmt" count="3"/>
+        <line num="345" type="stmt" count="3"/>
+        <line num="346" type="stmt" count="3"/>
+        <line num="350" type="stmt" count="3"/>
+        <line num="351" type="stmt" count="1"/>
+        <line num="354" type="stmt" count="3"/>
+        <line num="356" type="stmt" count="3"/>
+        <line num="357" type="stmt" count="3"/>
+        <line num="364" type="method" name="add_script_attributes" visibility="private" complexity="3" crap="3.01" count="3"/>
+        <line num="366" type="stmt" count="3"/>
+        <line num="369" type="stmt" count="3"/>
+        <line num="370" type="stmt" count="1"/>
+        <line num="374" type="stmt" count="2"/>
+        <line num="375" type="stmt" count="2"/>
+        <line num="378" type="stmt" count="2"/>
+        <line num="379" type="stmt" count="0"/>
+        <line num="381" type="stmt" count="2"/>
+        <line num="382" type="stmt" count="2"/>
+        <line num="383" type="stmt" count="2"/>
+        <line num="384" type="stmt" count="2"/>
+        <line num="386" type="stmt" count="2"/>
+        <line num="393" type="method" name="add_style_attributes" visibility="private" complexity="3" crap="3.03" count="1"/>
+        <line num="395" type="stmt" count="1"/>
+        <line num="398" type="stmt" count="1"/>
+        <line num="399" type="stmt" count="0"/>
+        <line num="403" type="stmt" count="1"/>
+        <line num="404" type="stmt" count="1"/>
+        <line num="407" type="stmt" count="1"/>
+        <line num="408" type="stmt" count="0"/>
+        <line num="410" type="stmt" count="1"/>
+        <line num="411" type="stmt" count="1"/>
+        <line num="415" type="stmt" count="1"/>
+        <line num="417" type="stmt" count="1"/>
+        <line num="418" type="stmt" count="1"/>
+        <line num="419" type="stmt" count="1"/>
+        <line num="421" type="stmt" count="1"/>
+        <line num="428" type="method" name="get_attributes" visibility="private" complexity="3" crap="3" count="3"/>
+        <line num="429" type="stmt" count="3"/>
+        <line num="431" type="stmt" count="2"/>
+        <line num="432" type="stmt" count="2"/>
+        <line num="433" type="stmt" count="2"/>
+        <line num="434" type="stmt" count="3"/>
+        <line num="435" type="stmt" count="3"/>
+        <line num="436" type="stmt" count="3"/>
+        <metrics loc="439" ncloc="225" classes="1" methods="21" coveredmethods="14" conditionals="0" coveredconditionals="0" statements="105" coveredstatements="76" elements="126" coveredelements="90"/>
+      </file>
+    </package>
+    <metrics files="1" loc="439" ncloc="225" classes="1" methods="21" coveredmethods="14" conditionals="0" coveredconditionals="0" statements="105" coveredstatements="76" elements="126" coveredelements="90"/>
+  </project>
+</coverage>

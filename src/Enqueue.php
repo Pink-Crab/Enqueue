@@ -98,6 +98,12 @@ class Enqueue {
 	 */
 	protected $media = 'all';
 
+	/**
+	 * All custom flags and attributes to add to the script and style tags
+	 *
+	 * @var array<string, string|null>
+	 */
+	protected $attributes = array();
 
 
 	/**
@@ -258,6 +264,29 @@ class Enqueue {
 	}
 
 	/**
+	 * Adds a Flag (attribute with no value) to a script/style tag
+	 *
+	 * @param string $flag
+	 * @return self
+	 */
+	public function flag( string $flag ): self {
+		$this->attributes[ $flag ] = null;
+		return $this;
+	}
+
+	/**
+	 * Adds an attribute tto a script/style tag
+	 *
+	 * @param string $key
+	 * @param string $value
+	 * @return self
+	 */
+	public function attribute( string $key, string $value ): self {
+		$this->attributes[ $key ] = $value;
+		return $this;
+	}
+
+	/**
 	 * Registers the file as either enqueued or inline parsed.
 	 *
 	 * @return void
@@ -285,6 +314,9 @@ class Enqueue {
 			$this->ver,
 			$this->media
 		);
+
+		$this->add_style_attributes();
+
 	}
 
 	/**
@@ -320,5 +352,88 @@ class Enqueue {
 		}
 
 		\wp_enqueue_script( $this->handle );
+
+		$this->add_script_attributes();
+	}
+
+	/**
+	 * Adds any additional attributes to a script.
+	 *
+	 * @return void
+	 */
+	private function add_script_attributes(): void {
+
+		$attributes = $this->get_attributes();
+
+		// Bail if we have no attributes.
+		if ( 0 === count( $attributes ) ) {
+			return;
+		}
+
+		// Add to any scripts.
+		add_filter(
+			'script_loader_tag',
+			function( string $tag, string $handle, string $source ) use ( $attributes ): string {
+				// Bail if not our script.
+				if ( $this->handle !== $handle ) {
+					return $tag;
+				}
+				return sprintf( '<script type="text/javascript" src="%s" %s></script>', $source, join( ' ', $attributes ) ); //phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript
+			},
+			1,
+			3
+		);
+	}
+
+	/**
+	 * Adds any additional attributes to a style.
+	 *
+	 * @return void
+	 */
+	private function add_style_attributes(): void {
+
+		$attributes = $this->get_attributes();
+
+		// Bail if we have no attributes.
+		if ( 0 === count( $attributes ) ) {
+			return;
+		}
+
+		// Add to any relevant styles.
+		add_filter(
+			'style_loader_tag',
+			function( string $tag, string $handle, string $href, string $media ) use ( $attributes ): string {
+				// Bail if not our script.
+				if ( $this->handle !== $handle ) {
+					return $tag;
+				}
+				return sprintf(
+					'<link rel="stylesheet" id="%s-css" href="%s" type="text/css" media="%s" %s>', //phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet
+					$handle,
+					$href,
+					$media,
+					join( ' ', $attributes )
+				);
+			},
+			1,
+			4
+		);
+	}
+
+	/**
+	 * Gets all attributes mapped as HTML attributes.
+	 *
+	 * @return string[]
+	 */
+	private function get_attributes():array {
+		return array_map(
+			function( string $key, ?string $value ): string {
+				return null === $value
+					? "{$key}"
+					: "{$key}='{$value}'";
+			},
+			array_keys( $this->attributes ),
+			$this->attributes
+		);
 	}
 }
