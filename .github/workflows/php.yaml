@@ -34,12 +34,12 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-versions }}
-          extensions: mbstring, intl
+          extensions: mbstring, intl, pcov
           ini-values: post_max_size=256M, log_errors=1
           tools: pecl
 
-      - name: Install PCOV
-        run: pecl install pcov
+      # - name: Install PCOV
+      #   run: pecl install pcov
 
       - name: Check PHP Version
         run: php -v
