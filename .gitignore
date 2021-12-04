@@ -3,3 +3,4 @@ wordpress
 composer.lock
 coverage-report
 clover.xml
+workspace.code-workspace

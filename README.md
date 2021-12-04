@@ -2,18 +2,15 @@
 
 ![alt text](https://img.shields.io/badge/PHPStan-level%208-brightgreen.svg?style=flat " ")
 
-The PinkCrab Enqueue calss allows for a clean and chainable alternative for enqueuing scripts and styles in WordPress.
+The PinkCrab Enqueue class allows for a clean and fluent alternative for enqueuing scripts and styles in WordPress.
 
 To install 
 ```bash
 composer require pinkcrab/enqueue
 ```
 
-
 ## Version ##
-**Release 1.1.0**
-
-** At present this class doesnt support BC in regards named properties in PHP8. Argument names may change, although we have made this so most methods take a single or no properites at all. **
+**Release 1.2.0**
 
 
 
@@ -319,8 +316,13 @@ add_action('wp_loaded', [new My_Thingy, 'init']);
     */
    public function register(): void
 
+   
+
 ```
 This obviously can be passed around between different classes/functions
+
+### Changelog ###
+* 1.2.0 : Added in Attribute and Flag support with helpers for Aysnc and Defer 
 
 ### Contributions  ###
 If you would like to make any suggestions or contributions to this little class, please feel free to submit a pull request or reach out to speak to me. at glynn@pinkcrab.co.uk.
