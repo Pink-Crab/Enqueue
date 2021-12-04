@@ -49,6 +49,6 @@
         "coverage": "phpunit --coverage-html coverage-report --testdox",
         "analyse": "vendor/bin/phpstan analyse src -l8",
         "sniff": "./vendor/bin/phpcs src/ -v",
-        "all": "composer coverage && composer analyse && composer sniff"
+        "all": "composer test && composer analyse && composer sniff"
     }
 }
