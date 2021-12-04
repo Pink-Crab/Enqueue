@@ -1,3 +1,5 @@
 vendor
 wordpress
 composer.lock
+coverage-report
+clover.xml
