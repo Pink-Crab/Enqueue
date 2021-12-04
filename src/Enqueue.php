@@ -287,6 +287,36 @@ class Enqueue {
 	}
 
 	/**
+	 * Marks the script or style as deferred loaded.
+	 *
+	 * @return self
+	 */
+	public function defer(): self {
+		// Remove ASYNC if set.
+		if ( \array_key_exists( 'async', $this->attributes ) ) {
+			unset( $this->attributes['async'] );
+		}
+
+		$this->attributes['defer'] = '';
+		return $this;
+	}
+
+	/**
+	 * Marks the script or style as async loaded.
+	 *
+	 * @return self
+	 */
+	public function async(): self {
+		// Remove DEFER if set.
+		if ( \array_key_exists( 'defer', $this->attributes ) ) {
+			unset( $this->attributes['defer'] );
+		}
+
+		$this->attributes['async'] = '';
+		return $this;
+	}
+
+	/**
 	 * Registers the file as either enqueued or inline parsed.
 	 *
 	 * @return void

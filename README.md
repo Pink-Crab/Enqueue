@@ -179,6 +179,55 @@ Enqueue::style('my_style')
     ->register();
 
 ```
+### Attributes ###
+It is possible (since v1.2.0) to add attributes and flags (value free attributes) to either script or style tags.
+```php
+<?php
+Enqueue::style('my_style')
+    ->src('http://www.site.com/my-style.css')
+    ->attribute('key', 'value')
+    ->register();
+
+// Rendered as
+// <link href="[.css/bootstrap.min.css](http://www.site.com/my-style.css)" rel="stylesheet" type="text/css" key="value">
+```
+or
+
+```php
+<?php
+Enqueue::script('my_style')
+    ->src('http://www.site.com/my-scripts.js')
+    ->flag('key')
+    ->register();
+
+// Rendered as
+// <script src="http://www.site.com/my-scripts.js" key type="text/javascript"></script>
+```
+### Async & Defer ###
+There is also some shortcuts for making any script or style be defered or async tagged.
+```php
+<?php
+Enqueue::style('my_style')
+    ->src('http://www.site.com/my-style.css')
+    ->async()
+    ->register();
+
+// Rendered as
+// <link href="[.css/bootstrap.min.css](http://www.site.com/my-style.css)" rel="stylesheet" type="text/css" async="">
+```
+or
+
+```php
+<?php
+Enqueue::script('my_style')
+    ->src('http://www.site.com/my-scripts.js')
+    ->defer()
+    ->register();
+
+// Rendered as
+// <script src="http://www.site.com/my-scripts.js" defer="" type="text/javascript"></script>
+```
+
 ### Registration  ###
 Once your Enqueue object has been populted all you need to call **register()** for wp_enqueue_script() or wp_enqueue_style() to be called. You can either do all this inline (like the first example) or the Enqueue object can be populated and only called when required.
 
@@ -312,6 +361,37 @@ add_action('wp_loaded', [new My_Thingy, 'init']);
     * @return self
     */
    public function localize( array $args ): self
+
+   /**
+	 * Adds a Flag (attribute with no value) to a script/style tag
+	 *
+	 * @param string $flag
+	 * @return self
+	 */
+	public function flag( string $flag ): self 
+
+	/**
+	 * Adds an attribute tto a script/style tag
+	 *
+	 * @param string $key
+	 * @param string $value
+	 * @return self
+	 */
+	public function attribute( string $key, string $value ): self 
+
+	/**
+	 * Marks the script or style as deferred loaded.
+	 *
+	 * @return self
+	 */
+	public function defer(): self 
+
+	/**
+	 * Marks the script or style as async loaded.
+	 *
+	 * @return self
+	 */
+	public function async(): self 
 
    /**
     * Registers the file as either enqueued or inline parsed.

@@ -129,6 +129,73 @@ class Test_Enqueue extends WP_UnitTestCase {
 
 	}
 
+	/** @testdox It should be possible to denote a scriptas async easily. */
+	public function test_can_set_async_on_script(): void {
+		$script = self::create_script()->async();
 
+		$attributes = Objects::get_property( $script, 'attributes' );
+		$this->assertArrayHasKey( 'async', $attributes );
+	}
 
+	/** @testdox It should be possible to denote a style as async easily. */
+	public function test_can_set_async_style(): void {
+		$style = self::create_style()->async();
+
+		$attributes = Objects::get_property( $style, 'attributes' );
+		$this->assertArrayHasKey( 'async', $attributes );
+	}
+
+	/** @testdox It should be possible to denote a scriptas defer easily. */
+	public function test_can_set_defer_on_script(): void {
+		$script = self::create_script()->defer();
+
+		$attributes = Objects::get_property( $script, 'attributes' );
+		$this->assertArrayHasKey( 'defer', $attributes );
+	}
+
+	/** @testdox It should be possible to denote a style as defer easily. */
+	public function test_can_set_defer_style(): void {
+		$style = self::create_style()->defer();
+
+		$attributes = Objects::get_property( $style, 'attributes' );
+		$this->assertArrayHasKey( 'defer', $attributes );
+	}
+
+	/** @testdox It should not be possible to set both async and defer, either should unset the other */
+	public function test_can_only_be_async_or_defer(): void {
+		$script     = self::create_script()->async();
+		$attributes = Objects::get_property( $script, 'attributes' );
+		$this->assertArrayHasKey( 'async', $attributes );
+		$this->assertArrayNotHasKey( 'defer', $attributes );
+
+		$script->defer();
+		$attributes = Objects::get_property( $script, 'attributes' );
+		$this->assertArrayHasKey( 'defer', $attributes );
+		$this->assertArrayNotHasKey( 'async', $attributes );
+
+		$script->async();
+		$attributes = Objects::get_property( $script, 'attributes' );
+		$this->assertArrayHasKey( 'async', $attributes );
+		$this->assertArrayNotHasKey( 'defer', $attributes );
+	}
+
+	/** @testdox It should be possible to define if a script is added to the header */
+	public function test_can_set_script_in_header(): void {
+		$script = Enqueue::script( 'header' )->header();
+		$this->assertFalse( Objects::get_property( $script, 'footer' ) );
+	}
+
+	/** @testdox It should be possible to toggle if a script in enqueued inline. */
+	public function test_can_set_script_as_inline(): void {
+		$script = Enqueue::script( 'header' )->inline();
+		$this->assertTrue( Objects::get_property( $script, 'inline' ) );
+
+		// As false
+		$script = Enqueue::script( 'header' )->inline( false );
+		$this->assertFalse( Objects::get_property( $script, 'inline' ) );
+
+		// Verbose true.
+		$script = Enqueue::script( 'header' )->inline( true );
+		$this->assertTrue( Objects::get_property( $script, 'inline' ) );
+	}
 }
