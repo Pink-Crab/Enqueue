@@ -328,7 +328,7 @@ class Enqueue {
 	 * @param bool $for_block Denotes if being enqueued for a block.
 	 * @return self
 	 */
-	public function for_block( bool $for_block = true ) {
+	public function for_block( bool $for_block = true ) : self {
 		$this->for_block = $for_block;
 		return $this;
 	}

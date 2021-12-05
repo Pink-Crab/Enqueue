@@ -1,8 +1,8 @@
 # PinkCrab Enqueue #
 
-![alt text](https://img.shields.io/badge/Current_Version-0.1.0-yellow.svg?style=flat " ") 
+![alt text](https://img.shields.io/badge/Current_Version-1.2.1-yellow.svg?style=flat " ") 
 [![Open Source Love](https://badges.frapsoft.com/os/mit/mit.svg?v=102)]()
-![](https://github.com/Pink-Crab/Perique-Route/workflows/GitHub_CI/badge.svg " ")
+![](https://github.com/Pink-Crab/Enqueue/workflows/GitHub_CI/badge.svg " ")
 [![codecov](https://codecov.io/gh/Pink-Crab/Enqueue/branch/master/graph/badge.svg?token=9O27LAKVWI)](https://codecov.io/gh/Pink-Crab/Enqueue) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Pink-Crab/Enqueue/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Pink-Crab/Enqueue/?branch=master)
 
 
@@ -14,7 +14,7 @@ composer require pinkcrab/enqueue
 ```
 
 ## Version ##
-**Release 1.2.0**
+**Release 1.2.1**
 
 
 
@@ -213,7 +213,7 @@ Enqueue::style('my_style')
     ->register();
 
 // Rendered as
-// <link href="[.css/bootstrap.min.css](http://www.site.com/my-style.css)" rel="stylesheet" type="text/css" async="">
+// <link href="http://www.site.com/my-style.css" rel="stylesheet" type="text/css" async="">
 ```
 or
 
@@ -271,6 +271,21 @@ class My_Thingy{
 add_action('wp_loaded', [new My_Thingy, 'init']);
 ```
 
+## Gutenberg ##
+
+When registering scripts and styles for use with Gutenberg blocks, it is necessery to only register the assets before `wp_enqueue_scripts` hook is called. To do this, all you need to is set `for_block()`.
+
+```php
+add_action('init', function(){
+    Enqueue::script('my_style')
+        ->src('http://www.site.com/my-scripts.js')
+        ->defer()
+        ->for_block()
+        ->register();
+
+    // Register block as normal
+});
+```
 
 ## Public Methods
 
@@ -393,6 +408,14 @@ add_action('wp_loaded', [new My_Thingy, 'init']);
 	 */
 	public function async(): self 
 
+    /**
+	 * Set if being enqueued for a block.
+	 *
+	 * @param bool $for_block Denotes if being enqueued for a block.
+	 * @return self
+	 */
+	public function for_block( bool $for_block = true ) : self
+
    /**
     * Registers the file as either enqueued or inline parsed.
     *
@@ -406,6 +429,7 @@ add_action('wp_loaded', [new My_Thingy, 'init']);
 This obviously can be passed around between different classes/functions
 
 ### Changelog ###
+* 1.2.1 : Now supports block use. If defined for block, scripts and styles will only be registered, not enqueued.
 * 1.2.0 : Added in Attribute and Flag support with helpers for Aysnc and Defer 
 
 ### Contributions  ###
