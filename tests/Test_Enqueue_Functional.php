@@ -21,11 +21,11 @@ use PinkCrab\FunctionConstructors\GeneralFunctions as Func;
 
 class Test_Enqueue_Functional extends \WP_UnitTestCase {
 
-    /**
-     * Resets the global scripts 
-     *
-     * @return void
-     */
+	/**
+	 * Resets the global scripts
+	 *
+	 * @return void
+	 */
 	public function tearDown() {
 		$GLOBALS['wp_scripts'] = array();
 	}
@@ -74,7 +74,7 @@ class Test_Enqueue_Functional extends \WP_UnitTestCase {
 		$this->assertEquals( '1', $dependency->extra['group'] );
 	}
 
-    /** @testdox It should be possible to set additional attributes to a script tag. */
+	/** @testdox It should be possible to set additional attributes to a script tag. */
 	public function test_add_script_attributes(): void {
 
 		// Enqueue
@@ -88,7 +88,7 @@ class Test_Enqueue_Functional extends \WP_UnitTestCase {
 					->flag( 'script_flag' )
 					->attribute( 'ATT', 'ribute' )
 					->register();
-            }
+			}
 		);
 
 		// Run and get all scripts/styles for header
@@ -140,7 +140,7 @@ class Test_Enqueue_Functional extends \WP_UnitTestCase {
 		return $scripts;
 	}
 
-    /** @testdox It should be possible to set additional attributes to a style tag. */
+	/** @testdox It should be possible to set additional attributes to a style tag. */
 	public function test_add_style_attributes(): void {
 
 		// Enqueue
@@ -166,7 +166,7 @@ class Test_Enqueue_Functional extends \WP_UnitTestCase {
 		);
 
 		$crawler = new Crawler( $header_html );
-        // Look for style flags.
+		// Look for style flags.
 		foreach ( $crawler->filter( '#style_with_atts-css' )->first() as $style_node ) {
 			for ( $i = 0; $i < $style_node->attributes->length; $i++ ) {
 				// Check attribute has correct value
@@ -180,6 +180,137 @@ class Test_Enqueue_Functional extends \WP_UnitTestCase {
 				}
 			}
 		}
-    }
+	}
+
+    /** @testdox It should be possible to denote a script for use with a block. This should register not enqueue the script. */
+	public function test_only_registers_script_for_block(): void {
+		// Enqueue
+		add_action(
+			'wp_enqueue_scripts',
+			function() {
+				Enqueue::script( 'script_for_block' )
+					->src( 'https://url.com/Fixtures/for_block.js' )
+                    ->header()
+					->for_block()
+					->register();
+			}
+		);
+
+
+		// Run and get all styles for header
+		$header_html = Output::buffer(
+			function() {
+				do_action( 'init' );
+				do_action( 'wp_enqueue_scripts' );
+				do_action( 'wp_head' );
+			}
+		);
+
+        // Attempt to find script in header, should not exist.
+		$script = Arr\filterFirst(
+			Comp\all(
+				Func\hasProperty( 'id' ),
+				Func\propertyEquals( 'id', 'script_for_block-js' )
+			)
+		)( $this->get_all_script_tags( $header_html ) );
+        $this->assertNull($script);
+        
+        // Script should not be queued.
+        $this->assertNotContains('script_for_block-js', $GLOBALS['wp_scripts']->queue);
+        $this->assertNotContains('script_for_block-js', $GLOBALS['wp_scripts']->done);
+        $this->assertArrayHasKey('script_for_block', $GLOBALS['wp_scripts']->registered);
+	}
+
+    /** @testdox When a script is not defined for use with a block, it should be registered and enqueued. */
+	public function test_enqueues_script_for_none_block(): void {
+		// Enqueue
+		add_action(
+			'wp_enqueue_scripts',
+			function() {
+				Enqueue::script( 'script_not_for_block' )
+					->src( 'https://url.com/Fixtures/not_for_block.js' )
+                    ->header()
+					->register();
+			}
+		);
+
+		// Run and get all styles for header
+		$header_html = Output::buffer(
+			function() {
+				do_action( 'init' );
+				do_action( 'wp_enqueue_scripts' );
+				do_action( 'wp_head' );
+			}
+		);
+
+        // Attempt to find script in header, should not exist.
+		$script = Arr\filterFirst(
+			Comp\all(
+				Func\hasProperty( 'id' ),
+				Func\propertyEquals( 'id', 'script_not_for_block-js' )
+			)
+		)( $this->get_all_script_tags( $header_html ) );
+        $this->assertNotEmpty($script);
+        
+        // Script should not be queued.
+        $this->assertContains('script_not_for_block', $GLOBALS['wp_scripts']->queue);
+        $this->assertContains('script_not_for_block', $GLOBALS['wp_scripts']->done);
+        $this->assertArrayHasKey('script_not_for_block', $GLOBALS['wp_scripts']->registered);
+	}
+
+    /** @testdox It should be possible to denote a style for use with a block. This should register not enqueue the style. */
+	public function test_only_registers_style_for_block(): void {
+		// Enqueue
+		add_action(
+			'wp_enqueue_scripts',
+			function() {
+				Enqueue::style( 'style_for_block' )
+					->src( 'https://url.com/Fixtures/for_block.css' )
+                    ->header()
+					->for_block()
+					->register();
+			}
+		);
+
+		Output::buffer(
+			function() {
+				do_action( 'init' );
+				do_action( 'wp_enqueue_scripts' );
+				do_action( 'wp_head' );
+			}
+		);
+        
+        // Script should not be queued.
+        $this->assertNotContains('style_for_block', $GLOBALS['wp_styles']->queue);
+        $this->assertNotContains('style_for_block', $GLOBALS['wp_styles']->done);
+        $this->assertArrayHasKey('style_for_block', $GLOBALS['wp_styles']->registered);
+	}
+
+    /** @testdox When a style is not defined for use with a block, it should be registered and enqueued. */
+	public function test_enqueues_style_for_none_block(): void {
+		// Enqueue
+		add_action(
+			'wp_enqueue_scripts',
+			function() {
+				Enqueue::style( 'style_not_for_block' )
+					->src( 'https://url.com/Fixtures/not_for_block.js' )
+                    ->header()
+					->register();
+			}
+		);
+
+		Output::buffer(
+			function() {
+				do_action( 'init' );
+				do_action( 'wp_enqueue_scripts' );
+				do_action( 'wp_head' );
+			}
+		);
+        
+        // Script should not be queued.
+        $this->assertContains('style_not_for_block', $GLOBALS['wp_styles']->queue);
+        $this->assertContains('style_not_for_block', $GLOBALS['wp_styles']->done);
+        $this->assertArrayHasKey('style_not_for_block', $GLOBALS['wp_styles']->registered);
+	}
 
 }

@@ -198,4 +198,23 @@ class Test_Enqueue extends WP_UnitTestCase {
 		$script = Enqueue::script( 'header' )->inline( true );
 		$this->assertTrue( Objects::get_property( $script, 'inline' ) );
 	}
+
+	/** @testdox It should be possible to toggle if a script in enqueued is for a block or not.. */
+	public function test_can_set_script_for_block(): void {
+		// False by default.
+		$script = Enqueue::script( 'for_block' );
+		$this->assertFalse( Objects::get_property( $script, 'for_block' ) );
+
+		// Set as true with no value passed.
+		$script = Enqueue::script( 'for_block' )->for_block();
+		$this->assertTrue( Objects::get_property( $script, 'for_block' ) );
+
+		// As false
+		$style = Enqueue::style( 'for_block' )->for_block( false );
+		$this->assertFalse( Objects::get_property( $style, 'for_block' ) );
+
+		// Verbose true.
+		$style = Enqueue::style( 'for_block' )->for_block( true );
+		$this->assertTrue( Objects::get_property( $style, 'for_block' ) );
+	}
 }
