@@ -290,138 +290,138 @@ add_action('init', function(){
 ## Public Methods
 
 ```php
-   /**
-    * Creates an Enqueue instance.
-    *
-    * @param string $handle
-    * @param string $type
-    */
-   public function __construct( string $handle, string $type )
+/**
+  * Creates an Enqueue instance.
+  *
+  * @param string $handle
+  * @param string $type
+  */
+ public function __construct( string $handle, string $type )
 
-   /**
-    * Creates a static instace of the Enqueue class for a script.
-    *
-    * @param string $handle
-    * @return self
-    */
-   public static function script( string $handle ): self
+/**
+  * Creates a static instace of the Enqueue class for a script.
+  *
+  * @param string $handle
+  * @return self
+  */
+ public static function script( string $handle ): self
 
-   /**
-    * Creates a static instace of the Enqueue class for a style.
-    *
-    * @param string $handle
-    * @return self
-    */
-   public static function style( string $handle ): self
+/**
+  * Creates a static instace of the Enqueue class for a style.
+  *
+  * @param string $handle
+  * @return self
+  */
+ public static function style( string $handle ): self
 
-   /**
-    * Defined the SRC of the file.
-    *
-    * @param string $src
-    * @return self
-    */
-   public function src( string $src ): self
+/**
+  * Defined the SRC of the file.
+  *
+  * @param string $src
+  * @return self
+  */
+ public function src( string $src ): self
 
-   /**
-    * Defined the Dependencies of the enqueue.
-    *
-    * @param string ...$deps
-    * @return self
-    */
-   public function deps( string ...$deps ): self
+/**
+  * Defined the Dependencies of the enqueue.
+  *
+  * @param string ...$deps
+  * @return self
+  */
+ public function deps( string ...$deps ): self
 
-   /**
-    * Defined the version of the enqueue
-    *
-    * @param string $ver
-    * @return self
-    */
-   public function ver( string $ver ): self
+/**
+  * Defined the version of the enqueue
+  *
+  * @param string $ver
+  * @return self
+  */
+ public function ver( string $ver ): self
 
-   /**
-    * Define the media type.
-    *
-    * @param string $media
-    * @return self
-    */
-   public function media( string $media ): self
+/**
+  * Define the media type.
+  *
+  * @param string $media
+  * @return self
+  */
+ public function media( string $media ): self
 
-   /**
-    * Sets the version as last modified file time.
-    *
-    * @return self
-    */
-   public function lastEditedVersion(): self
+/**
+  * Sets the version as last modified file time.
+  *
+  * @return self
+  */
+ public function lastEditedVersion(): self
 
-   /**
-    * Should the script be called in the footer.
-    *
-    * @param boolean $footer
-    * @return self
-    */
-   public function footer( bool $footer = true ): self
+/**
+  * Should the script be called in the footer.
+  *
+  * @param boolean $footer
+  * @return self
+  */
+ public function footer( bool $footer = true ): self
 
-   /**
-    * Should the script be called in the inline.
-    *
-    * @param boolean $inline
-    * @return self
-    */
-   public function inline( bool $inline = true ):self
+/**
+  * Should the script be called in the inline.
+  *
+  * @param boolean $inline
+  * @return self
+  */
+ public function inline( bool $inline = true ):self
 
-   /**
-    * Pass any key => value pairs to be localised with the enqueue.
-    *
-    * @param array $args
-    * @return self
-    */
-   public function localize( array $args ): self
+/**
+  * Pass any key => value pairs to be localised with the enqueue.
+  *
+  * @param array $args
+  * @return self
+  */
+ public function localize( array $args ): self
 
-   /**
-    * Adds a Flag (attribute with no value) to a script/style tag
-    *
-    * @param string $flag
-    * @return self
-    */
-   public function flag( string $flag ): self 
+/**
+  * Adds a Flag (attribute with no value) to a script/style tag
+  *
+  * @param string $flag
+  * @return self
+  */
+ public function flag( string $flag ): self 
 
-   /**
-    * Adds an attribute tto a script/style tag
-    *
-    * @param string $key
-    * @param string $value
-    * @return self
-    */
-   public function attribute( string $key, string $value ): self 
+/**
+  * Adds an attribute tto a script/style tag
+  *
+  * @param string $key
+  * @param string $value
+  * @return self
+  */
+ public function attribute( string $key, string $value ): self 
 
-   /**
-    * Marks the script or style as deferred loaded.
-    *
-    * @return self
-    */
-   public function defer(): self 
+/**
+  * Marks the script or style as deferred loaded.
+  *
+  * @return self
+  */
+ public function defer(): self 
 
-   /**
-    * Marks the script or style as async loaded.
-    *
-    * @return self
-    */
-   public function async(): self 
+/**
+  * Marks the script or style as async loaded.
+  *
+  * @return self
+  */
+ public function async(): self 
 
-   /**
-    * Set if being enqueued for a block.
-    *
-    * @param bool $for_block Denotes if being enqueued for a block.
-    * @return self
-    */
-   public function for_block( bool $for_block = true ) : self
+/**
+  * Set if being enqueued for a block.
+  *
+  * @param bool $for_block Denotes if being enqueued for a block.
+  * @return self
+  */
+ public function for_block( bool $for_block = true ) : self
 
-   /**
-    * Registers the file as either enqueued or inline parsed.
-    *
-    * @return void
-    */
-   public function register(): void
+/**
+  * Registers the file as either enqueued or inline parsed.
+  *
+  * @return void
+  */
+ public function register(): void
 
 ```
 This obviously can be passed around between different classes/functions
