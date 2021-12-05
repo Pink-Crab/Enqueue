@@ -1,8 +1,8 @@
 # PinkCrab Enqueue #
 
-![alt text](https://img.shields.io/badge/Current_Version-0.1.0-yellow.svg?style=flat " ") 
+![alt text](https://img.shields.io/badge/Current_Version-1.2.1-yellow.svg?style=flat " ") 
 [![Open Source Love](https://badges.frapsoft.com/os/mit/mit.svg?v=102)]()
-![](https://github.com/Pink-Crab/Perique-Route/workflows/GitHub_CI/badge.svg " ")
+![](https://github.com/Pink-Crab/Enqueue/workflows/GitHub_CI/badge.svg " ")
 [![codecov](https://codecov.io/gh/Pink-Crab/Enqueue/branch/master/graph/badge.svg?token=9O27LAKVWI)](https://codecov.io/gh/Pink-Crab/Enqueue) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Pink-Crab/Enqueue/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Pink-Crab/Enqueue/?branch=master)
 
 
@@ -14,7 +14,7 @@ composer require pinkcrab/enqueue
 ```
 
 ## Version ##
-**Release 1.2.0**
+**Release 1.2.1**
 
 
 
@@ -213,7 +213,7 @@ Enqueue::style('my_style')
     ->register();
 
 // Rendered as
-// <link href="[.css/bootstrap.min.css](http://www.site.com/my-style.css)" rel="stylesheet" type="text/css" async="">
+// <link href="http://www.site.com/my-style.css" rel="stylesheet" type="text/css" async="">
 ```
 or
 
@@ -271,141 +271,163 @@ class My_Thingy{
 add_action('wp_loaded', [new My_Thingy, 'init']);
 ```
 
+## Gutenberg ##
+
+When registering scripts and styles for use with Gutenberg blocks, it is necessery to only register the assets before `wp_enqueue_scripts` hook is called. To do this, all you need to is set `for_block()`.
+
+```php
+add_action('init', function(){
+    Enqueue::script('my_style')
+        ->src('http://www.site.com/my-scripts.js')
+        ->defer()
+        ->for_block()
+        ->register();
+
+    // Register block as normal
+});
+```
 
 ## Public Methods
 
 ```php
-   /**
-    * Creates an Enqueue instance.
-    *
-    * @param string $handle
-    * @param string $type
-    */
-   public function __construct( string $handle, string $type )
+/**
+  * Creates an Enqueue instance.
+  *
+  * @param string $handle
+  * @param string $type
+  */
+ public function __construct( string $handle, string $type )
 
-   /**
-    * Creates a static instace of the Enqueue class for a script.
-    *
-    * @param string $handle
-    * @return self
-    */
-   public static function script( string $handle ): self
+/**
+  * Creates a static instace of the Enqueue class for a script.
+  *
+  * @param string $handle
+  * @return self
+  */
+ public static function script( string $handle ): self
 
-   /**
-    * Creates a static instace of the Enqueue class for a style.
-    *
-    * @param string $handle
-    * @return self
-    */
-   public static function style( string $handle ): self
+/**
+  * Creates a static instace of the Enqueue class for a style.
+  *
+  * @param string $handle
+  * @return self
+  */
+ public static function style( string $handle ): self
 
-   /**
-    * Defined the SRC of the file.
-    *
-    * @param string $src
-    * @return self
-    */
-   public function src( string $src ): self
+/**
+  * Defined the SRC of the file.
+  *
+  * @param string $src
+  * @return self
+  */
+ public function src( string $src ): self
 
-   /**
-    * Defined the Dependencies of the enqueue.
-    *
-    * @param string ...$deps
-    * @return self
-    */
-   public function deps( string ...$deps ): self
+/**
+  * Defined the Dependencies of the enqueue.
+  *
+  * @param string ...$deps
+  * @return self
+  */
+ public function deps( string ...$deps ): self
 
-   /**
-    * Defined the version of the enqueue
-    *
-    * @param string $ver
-    * @return self
-    */
-   public function ver( string $ver ): self
+/**
+  * Defined the version of the enqueue
+  *
+  * @param string $ver
+  * @return self
+  */
+ public function ver( string $ver ): self
 
-   /**
-    * Define the media type.
-    *
-    * @param string $media
-    * @return self
-    */
-   public function media( string $media ): self
+/**
+  * Define the media type.
+  *
+  * @param string $media
+  * @return self
+  */
+ public function media( string $media ): self
 
-   /**
-    * Sets the version as last modified file time.
-    *
-    * @return self
-    */
-   public function lastEditedVersion(): self
+/**
+  * Sets the version as last modified file time.
+  *
+  * @return self
+  */
+ public function lastEditedVersion(): self
 
-   /**
-    * Should the script be called in the footer.
-    *
-    * @param boolean $footer
-    * @return self
-    */
-   public function footer( bool $footer = true ): self
+/**
+  * Should the script be called in the footer.
+  *
+  * @param boolean $footer
+  * @return self
+  */
+ public function footer( bool $footer = true ): self
 
-   /**
-    * Should the script be called in the inline.
-    *
-    * @param boolean $inline
-    * @return self
-    */
-   public function inline( bool $inline = true ):self
+/**
+  * Should the script be called in the inline.
+  *
+  * @param boolean $inline
+  * @return self
+  */
+ public function inline( bool $inline = true ):self
 
-   /**
-    * Pass any key => value pairs to be localised with the enqueue.
-    *
-    * @param array $args
-    * @return self
-    */
-   public function localize( array $args ): self
+/**
+  * Pass any key => value pairs to be localised with the enqueue.
+  *
+  * @param array $args
+  * @return self
+  */
+ public function localize( array $args ): self
 
-   /**
-	 * Adds a Flag (attribute with no value) to a script/style tag
-	 *
-	 * @param string $flag
-	 * @return self
-	 */
-	public function flag( string $flag ): self 
+/**
+  * Adds a Flag (attribute with no value) to a script/style tag
+  *
+  * @param string $flag
+  * @return self
+  */
+ public function flag( string $flag ): self 
 
-	/**
-	 * Adds an attribute tto a script/style tag
-	 *
-	 * @param string $key
-	 * @param string $value
-	 * @return self
-	 */
-	public function attribute( string $key, string $value ): self 
+/**
+  * Adds an attribute tto a script/style tag
+  *
+  * @param string $key
+  * @param string $value
+  * @return self
+  */
+ public function attribute( string $key, string $value ): self 
 
-	/**
-	 * Marks the script or style as deferred loaded.
-	 *
-	 * @return self
-	 */
-	public function defer(): self 
+/**
+  * Marks the script or style as deferred loaded.
+  *
+  * @return self
+  */
+ public function defer(): self 
 
-	/**
-	 * Marks the script or style as async loaded.
-	 *
-	 * @return self
-	 */
-	public function async(): self 
+/**
+  * Marks the script or style as async loaded.
+  *
+  * @return self
+  */
+ public function async(): self 
 
-   /**
-    * Registers the file as either enqueued or inline parsed.
-    *
-    * @return void
-    */
-   public function register(): void
+/**
+  * Set if being enqueued for a block.
+  *
+  * @param bool $for_block Denotes if being enqueued for a block.
+  * @return self
+  */
+ public function for_block( bool $for_block = true ) : self
 
-   
+/**
+  * Registers the file as either enqueued or inline parsed.
+  *
+  * @return void
+  */
+ public function register(): void
 
 ```
 This obviously can be passed around between different classes/functions
 
 ### Changelog ###
+* 1.2.1 : Now supports block use. If defined for block, scripts and styles will only be registered, not enqueued.
 * 1.2.0 : Added in Attribute and Flag support with helpers for Aysnc and Defer 
 
 ### Contributions  ###

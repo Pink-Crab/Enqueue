@@ -105,6 +105,12 @@ class Enqueue {
 	 */
 	protected $attributes = array();
 
+	/**
+	 * Denotes if being enqueued for a block.
+	 *
+	 * @var bool
+	 */
+	protected $for_block = false;
 
 	/**
 	 * Creates an Enqueue instance.
@@ -317,6 +323,17 @@ class Enqueue {
 	}
 
 	/**
+	 * Set if being enqueued for a block.
+	 *
+	 * @param bool $for_block Denotes if being enqueued for a block.
+	 * @return self
+	 */
+	public function for_block( bool $for_block = true ) : self {
+		$this->for_block = $for_block;
+		return $this;
+	}
+
+	/**
 	 * Registers the file as either enqueued or inline parsed.
 	 *
 	 * @return void
@@ -337,13 +354,17 @@ class Enqueue {
 	 * @return void
 	 */
 	private function register_style() {
-		\wp_enqueue_style(
+
+		\wp_register_style(
 			$this->handle,
 			$this->src,
 			$this->deps,
 			$this->ver,
 			$this->media
 		);
+		if ( false === $this->for_block ) {
+			wp_enqueue_style( $this->handle );
+		}
 
 		$this->add_style_attributes();
 
@@ -356,32 +377,28 @@ class Enqueue {
 	 */
 	private function register_script() {
 
-		if ( $this->inline ) {
-			\wp_register_script(
-				$this->handle,
-				'',
-				$this->deps,
-				$this->ver,
-				$this->footer
-			);
-			if ( $this->does_file_exist( $this->src ) ) {
-				\wp_add_inline_script( $this->handle, file_get_contents( $this->src ) ?: '' );
-			}
-		} else {
-			wp_register_script(
-				$this->handle,
-				$this->src,
-				$this->deps,
-				$this->ver,
-				$this->footer
-			);
+		\wp_register_script(
+			$this->handle,
+			$this->inline === true ? '' : $this->src,
+			$this->deps,
+			$this->ver,
+			$this->footer
+		);
+
+		// Maybe add as an inline script.
+		if ( $this->inline && $this->does_file_exist( $this->src ) ) {
+			\wp_add_inline_script( $this->handle, file_get_contents( $this->src ) ?: '' );
 		}
 
+		// Localize all values if defined.
 		if ( ! empty( $this->localize ) ) {
 			\wp_localize_script( $this->handle, $this->handle, $this->localize );
 		}
 
-		\wp_enqueue_script( $this->handle );
+		// Enqueue file if not used for a block.
+		if ( false === $this->for_block ) {
+			\wp_enqueue_script( $this->handle );
+		}
 
 		$this->add_script_attributes();
 	}
@@ -466,4 +483,6 @@ class Enqueue {
 			$this->attributes
 		);
 	}
+
+
 }
