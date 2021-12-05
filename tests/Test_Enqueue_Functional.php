@@ -182,7 +182,7 @@ class Test_Enqueue_Functional extends \WP_UnitTestCase {
 		}
 	}
 
-    /** @testdox It should be possible to denote a script for use with a block. This should register not enqueue the script. */
+	/** @testdox It should be possible to denote a script for use with a block. This should register not enqueue the script. */
 	public function test_only_registers_script_for_block(): void {
 		// Enqueue
 		add_action(
@@ -190,12 +190,11 @@ class Test_Enqueue_Functional extends \WP_UnitTestCase {
 			function() {
 				Enqueue::script( 'script_for_block' )
 					->src( 'https://url.com/Fixtures/for_block.js' )
-                    ->header()
+					->header()
 					->for_block()
 					->register();
 			}
 		);
-
 
 		// Run and get all styles for header
 		$header_html = Output::buffer(
@@ -206,22 +205,22 @@ class Test_Enqueue_Functional extends \WP_UnitTestCase {
 			}
 		);
 
-        // Attempt to find script in header, should not exist.
+		// Attempt to find script in header, should not exist.
 		$script = Arr\filterFirst(
 			Comp\all(
 				Func\hasProperty( 'id' ),
 				Func\propertyEquals( 'id', 'script_for_block-js' )
 			)
 		)( $this->get_all_script_tags( $header_html ) );
-        $this->assertNull($script);
-        
-        // Script should not be queued.
-        $this->assertNotContains('script_for_block-js', $GLOBALS['wp_scripts']->queue);
-        $this->assertNotContains('script_for_block-js', $GLOBALS['wp_scripts']->done);
-        $this->assertArrayHasKey('script_for_block', $GLOBALS['wp_scripts']->registered);
+		$this->assertNull( $script );
+
+		// Script should not be queued.
+		$this->assertNotContains( 'script_for_block-js', $GLOBALS['wp_scripts']->queue );
+		$this->assertNotContains( 'script_for_block-js', $GLOBALS['wp_scripts']->done );
+		$this->assertArrayHasKey( 'script_for_block', $GLOBALS['wp_scripts']->registered );
 	}
 
-    /** @testdox When a script is not defined for use with a block, it should be registered and enqueued. */
+	/** @testdox When a script is not defined for use with a block, it should be registered and enqueued. */
 	public function test_enqueues_script_for_none_block(): void {
 		// Enqueue
 		add_action(
@@ -229,7 +228,7 @@ class Test_Enqueue_Functional extends \WP_UnitTestCase {
 			function() {
 				Enqueue::script( 'script_not_for_block' )
 					->src( 'https://url.com/Fixtures/not_for_block.js' )
-                    ->header()
+					->header()
 					->register();
 			}
 		);
@@ -243,22 +242,22 @@ class Test_Enqueue_Functional extends \WP_UnitTestCase {
 			}
 		);
 
-        // Attempt to find script in header, should not exist.
+		// Attempt to find script in header, should not exist.
 		$script = Arr\filterFirst(
 			Comp\all(
 				Func\hasProperty( 'id' ),
 				Func\propertyEquals( 'id', 'script_not_for_block-js' )
 			)
 		)( $this->get_all_script_tags( $header_html ) );
-        $this->assertNotEmpty($script);
-        
-        // Script should not be queued.
-        $this->assertContains('script_not_for_block', $GLOBALS['wp_scripts']->queue);
-        $this->assertContains('script_not_for_block', $GLOBALS['wp_scripts']->done);
-        $this->assertArrayHasKey('script_not_for_block', $GLOBALS['wp_scripts']->registered);
+		$this->assertNotEmpty( $script );
+
+		// Script should not be queued.
+		$this->assertContains( 'script_not_for_block', $GLOBALS['wp_scripts']->queue );
+		$this->assertContains( 'script_not_for_block', $GLOBALS['wp_scripts']->done );
+		$this->assertArrayHasKey( 'script_not_for_block', $GLOBALS['wp_scripts']->registered );
 	}
 
-    /** @testdox It should be possible to denote a style for use with a block. This should register not enqueue the style. */
+	/** @testdox It should be possible to denote a style for use with a block. This should register not enqueue the style. */
 	public function test_only_registers_style_for_block(): void {
 		// Enqueue
 		add_action(
@@ -266,7 +265,7 @@ class Test_Enqueue_Functional extends \WP_UnitTestCase {
 			function() {
 				Enqueue::style( 'style_for_block' )
 					->src( 'https://url.com/Fixtures/for_block.css' )
-                    ->header()
+					->header()
 					->for_block()
 					->register();
 			}
@@ -279,14 +278,14 @@ class Test_Enqueue_Functional extends \WP_UnitTestCase {
 				do_action( 'wp_head' );
 			}
 		);
-        
-        // Script should not be queued.
-        $this->assertNotContains('style_for_block', $GLOBALS['wp_styles']->queue);
-        $this->assertNotContains('style_for_block', $GLOBALS['wp_styles']->done);
-        $this->assertArrayHasKey('style_for_block', $GLOBALS['wp_styles']->registered);
+
+		// Script should not be queued.
+		$this->assertNotContains( 'style_for_block', $GLOBALS['wp_styles']->queue );
+		$this->assertNotContains( 'style_for_block', $GLOBALS['wp_styles']->done );
+		$this->assertArrayHasKey( 'style_for_block', $GLOBALS['wp_styles']->registered );
 	}
 
-    /** @testdox When a style is not defined for use with a block, it should be registered and enqueued. */
+	/** @testdox When a style is not defined for use with a block, it should be registered and enqueued. */
 	public function test_enqueues_style_for_none_block(): void {
 		// Enqueue
 		add_action(
@@ -294,7 +293,7 @@ class Test_Enqueue_Functional extends \WP_UnitTestCase {
 			function() {
 				Enqueue::style( 'style_not_for_block' )
 					->src( 'https://url.com/Fixtures/not_for_block.js' )
-                    ->header()
+					->header()
 					->register();
 			}
 		);
@@ -306,11 +305,11 @@ class Test_Enqueue_Functional extends \WP_UnitTestCase {
 				do_action( 'wp_head' );
 			}
 		);
-        
-        // Script should not be queued.
-        $this->assertContains('style_not_for_block', $GLOBALS['wp_styles']->queue);
-        $this->assertContains('style_not_for_block', $GLOBALS['wp_styles']->done);
-        $this->assertArrayHasKey('style_not_for_block', $GLOBALS['wp_styles']->registered);
+
+		// Script should not be queued.
+		$this->assertContains( 'style_not_for_block', $GLOBALS['wp_styles']->queue );
+		$this->assertContains( 'style_not_for_block', $GLOBALS['wp_styles']->done );
+		$this->assertArrayHasKey( 'style_not_for_block', $GLOBALS['wp_styles']->registered );
 	}
 
 }
