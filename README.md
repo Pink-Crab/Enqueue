@@ -378,43 +378,43 @@ add_action('init', function(){
    public function localize( array $args ): self
 
    /**
-	 * Adds a Flag (attribute with no value) to a script/style tag
-	 *
-	 * @param string $flag
-	 * @return self
-	 */
-	public function flag( string $flag ): self 
+    * Adds a Flag (attribute with no value) to a script/style tag
+    *
+    * @param string $flag
+    * @return self
+    */
+   public function flag( string $flag ): self 
 
-	/**
-	 * Adds an attribute tto a script/style tag
-	 *
-	 * @param string $key
-	 * @param string $value
-	 * @return self
-	 */
-	public function attribute( string $key, string $value ): self 
+   /**
+    * Adds an attribute tto a script/style tag
+    *
+    * @param string $key
+    * @param string $value
+    * @return self
+    */
+   public function attribute( string $key, string $value ): self 
 
-	/**
-	 * Marks the script or style as deferred loaded.
-	 *
-	 * @return self
-	 */
-	public function defer(): self 
+   /**
+    * Marks the script or style as deferred loaded.
+    *
+    * @return self
+    */
+   public function defer(): self 
 
-	/**
-	 * Marks the script or style as async loaded.
-	 *
-	 * @return self
-	 */
-	public function async(): self 
+   /**
+    * Marks the script or style as async loaded.
+    *
+    * @return self
+    */
+   public function async(): self 
 
-    /**
-	 * Set if being enqueued for a block.
-	 *
-	 * @param bool $for_block Denotes if being enqueued for a block.
-	 * @return self
-	 */
-	public function for_block( bool $for_block = true ) : self
+   /**
+    * Set if being enqueued for a block.
+    *
+    * @param bool $for_block Denotes if being enqueued for a block.
+    * @return self
+    */
+   public function for_block( bool $for_block = true ) : self
 
    /**
     * Registers the file as either enqueued or inline parsed.
@@ -422,8 +422,6 @@ add_action('init', function(){
     * @return void
     */
    public function register(): void
-
-   
 
 ```
 This obviously can be passed around between different classes/functions
