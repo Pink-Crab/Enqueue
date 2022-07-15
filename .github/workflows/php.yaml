@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         operating-system: [ubuntu-latest]
-        php-versions: ['7.1', '7.2', '7.3', '7.4']
+        php-versions: ['7.1', '7.2', '7.3', '7.4', '8.0', '8.1']
     runs-on: ${{ matrix.operating-system }}
     services:
       # Setup MYSQL
@@ -37,9 +37,6 @@ jobs:
           extensions: mbstring, intl, pcov
           ini-values: post_max_size=256M, log_errors=1
           tools: pecl
-
-      # - name: Install PCOV
-      #   run: pecl install pcov
 
       - name: Check PHP Version
         run: php -v

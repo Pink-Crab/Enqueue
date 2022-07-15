@@ -161,7 +161,7 @@ class Enqueue {
 	 * @return self
 	 */
 	public function deps( string ...$deps ): self {
-		$this->deps = $deps;
+		$this->deps = array_values( $deps );
 		return $this;
 	}
 
@@ -196,7 +196,10 @@ class Enqueue {
 	public function lastest_version(): self {
 		if ( $this->does_file_exist( $this->src ) ) {
 
-			$headers = get_headers( $this->src, 1 );
+			// If php8 or above set as bool, else int
+			$associate = ( PHP_VERSION_ID >= 80000 ) ? true : 1;
+
+			$headers = get_headers( $this->src, $associate );
 
 			if ( is_array( $headers )
 			&& array_key_exists( 'Last-Modified', $headers )

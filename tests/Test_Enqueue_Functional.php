@@ -26,7 +26,7 @@ class Test_Enqueue_Functional extends \WP_UnitTestCase {
 	 *
 	 * @return void
 	 */
-	public function tearDown() {
+	public function tearDown(): void {
 		$GLOBALS['wp_scripts'] = array();
 	}
 
