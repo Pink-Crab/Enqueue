@@ -113,6 +113,13 @@ class Enqueue {
 	protected $for_block = false;
 
 	/**
+	 * Denotes the script type.
+	 *
+	 * @var string
+	 */
+	protected $script_type = 'text/javascript';
+
+	/**
 	 * Creates an Enqueue instance.
 	 *
 	 * @param string $handle
@@ -413,11 +420,20 @@ class Enqueue {
 	 */
 	private function add_script_attributes(): void {
 
-		$attributes = $this->get_attributes();
+		$attributes = $this->get_script_attributes();
 
 		// Bail if we have no attributes.
-		if ( 0 === count( $attributes ) ) {
+		if ( 0 === count( $attributes ) && $this->script_type === 'text/javascript' ) {
 			return;
+		}
+
+		// If we have a custom script type, and an attribute doesnt start with id=
+		if ( $this->script_type !== 'text/javascript' && ! \strpos( $attributes[0], 'id=' ) ) {
+			$attributes[0] = 'type="' . $this->script_type . '" ' . $attributes[0];
+		}
+
+		if ( $this->script_type !== 'text/javascript' && ! \array_key_exists( 'id', $attributes ) ) {
+			$attributes['id'] = "{$this->handle}-js";
 		}
 
 		// Add to any scripts.
@@ -428,11 +444,30 @@ class Enqueue {
 				if ( $this->handle !== $handle ) {
 					return $tag;
 				}
-				return sprintf( '<script type="text/javascript" src="%s" %s></script>', $source, join( ' ', $attributes ) ); //phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript
+				return sprintf( '<script type="%s" src="%s" %s></script>', $this->script_type, $source, join( ' ', $attributes ) ); //phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript
 			},
 			1,
 			3
 		);
+	}
+
+	/**
+	 * Adds the ID attribute if not set for script and script type is not text/javascript.
+	 *
+	 * @return string[]
+	 */
+	private function get_script_attributes(): array {
+		$attributes = $this->get_attributes();
+		// Loop through and look for any that start with 'id='
+		foreach ( $attributes as $key => $value ) {
+			if ( \strpos( $value, 'id=' ) === 0 ) {
+				return $attributes;
+			}
+		}
+
+		// Add to attributes
+		$attributes[] = \sprintf( "id='%s'", "{$this->handle}-js" );
+		return $attributes;
 	}
 
 	/**
@@ -471,6 +506,17 @@ class Enqueue {
 	}
 
 	/**
+	 * Set denotes the script type.
+	 *
+	 * @param string $script_type  Denotes the script type.
+	 * @return self
+	 */
+	public function script_type( string $script_type ) {
+		$this->script_type = $script_type;
+		return $this;
+	}
+
+	/**
 	 * Gets all attributes mapped as HTML attributes.
 	 *
 	 * @return string[]
@@ -486,6 +532,5 @@ class Enqueue {
 			$this->attributes
 		);
 	}
-
 
 }

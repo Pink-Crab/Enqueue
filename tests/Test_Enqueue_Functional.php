@@ -312,4 +312,45 @@ class Test_Enqueue_Functional extends \WP_UnitTestCase {
 		$this->assertArrayHasKey( 'style_not_for_block', $GLOBALS['wp_styles']->registered );
 	}
 
+	/** @testdox It should be possible to set a script with a type of Module and have it rendered as such. */
+	public function test_renders_script_as_module(): void {
+		// Enqueue
+		add_action(
+			'wp_enqueue_scripts',
+			function() {
+				Enqueue::script( 'script_as_module' )
+					->src( 'https://url.com/Fixtures/as_module.js' )
+					->ver('1.1.1')
+					->header()
+					->script_type('module')
+					->attribute('id', 'ddd')
+					->register();
+			}
+		);
+
+		// Run and get all styles for header
+		$header_html = Output::buffer(
+			function() {
+				do_action( 'init' );
+				do_action( 'wp_enqueue_scripts' );
+				do_action( 'wp_head' );
+			}
+		);
+
+		// \dump( $header_html );
+		// Attempt to find script in header, should not exist.
+		$script = Arr\filterFirst(
+			Comp\all(
+				Func\hasProperty( 'id' ),
+				Func\propertyEquals( 'id', 'ddd' )
+				// Func\propertyEquals( 'id', 'script_as_module-js' )
+			)
+		)( $this->get_all_script_tags( $header_html ) );
+		dump( $script );
+
+		$this->assertEquals( 'module', $script['type'] );
+		$this->assertEquals( 'https://url.com/Fixtures/as_module.js?ver=1.1.1', $script['src'] );
+
+	}
+
 }
