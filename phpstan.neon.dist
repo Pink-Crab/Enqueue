@@ -10,3 +10,5 @@ parameters:
         - %currentWorkingDirectory%/tests/*
     bootstrapFiles:
         - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
+    ignoreErrors:
+        - '^Parameter #2 \$associative of function get_headers expects bool, int\|true given^'
