@@ -11,4 +11,4 @@ parameters:
     bootstrapFiles:
         - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
     ignoreErrors:
-        - '^function get_headers expects bool, int\|true given^'
+        - '^function get_headers expects (?:bool|int), int\|true given^'
