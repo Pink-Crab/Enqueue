@@ -1,5 +1,3 @@
-# Start command: composer update --classmap-authoritative && vendor/bin/phpstan analyze
-
 includes:
     - vendor/phpstan/phpstan/conf/bleedingEdge.neon
     - vendor/szepeviktor/phpstan-wordpress/extension.neon
@@ -8,7 +6,7 @@ parameters:
     inferPrivatePropertyTypeFromConstructor: true
     paths:
         - %currentWorkingDirectory%/src/
-    excludes_analyse:
+    excludePaths:
         - %currentWorkingDirectory%/tests/*
     bootstrapFiles:
         - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php

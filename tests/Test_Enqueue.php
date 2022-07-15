@@ -19,10 +19,6 @@ use Gin0115\WPUnit_Helpers\Objects;
 class Test_Enqueue extends WP_UnitTestCase {
 
 
-	public function setUp() {
-
-	}
-
 	/**
 	 * Retruns a fully populated enqueue script isntance..
 	 *
