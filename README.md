@@ -427,6 +427,7 @@ add_action('init', function(){
 This obviously can be passed around between different classes/functions
 
 ### Changelog ###
+* 1.3.0 - Updated for php8, includes setting of custom script types
 * 1.2.1 : Now supports block use. If defined for block, scripts and styles will only be registered, not enqueued.
 * 1.2.0 : Added in Attribute and Flag support with helpers for Aysnc and Defer 
 
