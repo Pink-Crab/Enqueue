@@ -115,6 +115,7 @@ class Test_Enqueue_Functional extends \WP_UnitTestCase {
 		$this->assertArrayHasKey( 'att', $script );
 		$this->assertEquals( '', $script['script_flag'] );
 		$this->assertEquals( 'ribute', $script['att'] );
+		$this->assertEquals( 'text/javascript', $script['type'] );
 
 	}
 
@@ -313,17 +314,17 @@ class Test_Enqueue_Functional extends \WP_UnitTestCase {
 	}
 
 	/** @testdox It should be possible to set a script with a type of Module and have it rendered as such. */
-	public function test_renders_script_as_module(): void {
+	public function test_renders_script_as_module_in_header(): void {
+
 		// Enqueue
 		add_action(
 			'wp_enqueue_scripts',
 			function() {
 				Enqueue::script( 'script_as_module' )
 					->src( 'https://url.com/Fixtures/as_module.js' )
-					->ver('1.1.1')
+					->ver( '1.1.1' )
 					->header()
-					->script_type('module')
-					->attribute('id', 'ddd')
+					->script_type( 'module' )
 					->register();
 			}
 		);
@@ -337,20 +338,91 @@ class Test_Enqueue_Functional extends \WP_UnitTestCase {
 			}
 		);
 
-		// \dump( $header_html );
 		// Attempt to find script in header, should not exist.
 		$script = Arr\filterFirst(
 			Comp\all(
 				Func\hasProperty( 'id' ),
-				Func\propertyEquals( 'id', 'ddd' )
-				// Func\propertyEquals( 'id', 'script_as_module-js' )
+				Func\propertyEquals( 'id', 'script_as_module-js' )
 			)
 		)( $this->get_all_script_tags( $header_html ) );
-		dump( $script );
 
+		// Check the type is set as module.
 		$this->assertEquals( 'module', $script['type'] );
 		$this->assertEquals( 'https://url.com/Fixtures/as_module.js?ver=1.1.1', $script['src'] );
-
 	}
 
+	/** 
+	 * @testdox If no attributes are defined and no custom type is set, the script_loader_tag filter should not be added.
+	  * @_runInSeparateProcess
+ * @_preserveGlobalState disabled
+	 */
+	public function test_no_script_loader_tag_filter_added_if_no_attributes_and_no_custom_type(): void {
+		
+		// Ensure no other scripts are queued up
+		do_action( 'init' );
+		unset( $GLOBALS['wp_filter']['wp_enqueue_scripts'] );
+		
+		// Enqueue
+		add_action(
+			'wp_enqueue_scripts',
+			function() {
+				Enqueue::script( 'script_no_attributes' )
+					->src( 'https://url.com/Fixtures/no_attributes.js' )
+					->header()
+					->register();
+			}
+		);
+
+		// Run and get all styles for header
+		$header_html = Output::buffer(
+			function() {
+				
+				do_action( 'wp_enqueue_scripts' );
+				unset( $GLOBALS['wp_filter']['script_loader_tag'] );
+				do_action( 'wp_head' );
+			}
+		);
+
+
+		// The filter should not be added.
+		$this->assertArrayNotHasKey( 'script_loader_tag', $GLOBALS['wp_filter'] );
+	}
+
+	/** @testdox When registering a script, if the type is custom and manual id is added to attributes, it should not be auto generated. */
+	public function test_manual_id_added_to_attributes_if_custom_type_and_manual_id(): void {
+		// Enqueue
+		add_action(
+			'wp_enqueue_scripts',
+			function() {
+				Enqueue::script( 'script_manual_id' )
+					->src( 'https://url.com/Fixtures/manual_id.js' )
+					->header()
+					->script_type( 'custom' )
+					->attribute( 'id', 'manual_id' )
+					->ver( '1.1.1' )
+					->register();
+			}
+		);
+
+		// Run and get all styles for header
+		$header_html = Output::buffer(
+			function() {
+				do_action( 'init' );
+				do_action( 'wp_enqueue_scripts' );
+				do_action( 'wp_head' );
+			}
+		);
+
+		// Attempt to find script in header, should not exist.
+		$script = Arr\filterFirst(
+			Comp\all(
+				Func\hasProperty( 'id' ),
+				Func\propertyEquals( 'id', 'manual_id' )
+			)
+		)( $this->get_all_script_tags( $header_html ) );
+
+		// Check the type is set as custom.
+		$this->assertEquals( 'custom', $script['type'] );
+		$this->assertEquals( 'https://url.com/Fixtures/manual_id.js?ver=1.1.1', $script['src'] );
+	}
 }

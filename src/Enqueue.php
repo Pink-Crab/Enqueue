@@ -422,18 +422,10 @@ class Enqueue {
 
 		$attributes = $this->get_script_attributes();
 
+
 		// Bail if we have no attributes.
-		if ( 0 === count( $attributes ) && $this->script_type === 'text/javascript' ) {
+		if ( 0 === count( $this->get_attributes() ) && $this->script_type === 'text/javascript' ) {
 			return;
-		}
-
-		// If we have a custom script type, and an attribute doesnt start with id=
-		if ( $this->script_type !== 'text/javascript' && ! \strpos( $attributes[0], 'id=' ) ) {
-			$attributes[0] = 'type="' . $this->script_type . '" ' . $attributes[0];
-		}
-
-		if ( $this->script_type !== 'text/javascript' && ! \array_key_exists( 'id', $attributes ) ) {
-			$attributes['id'] = "{$this->handle}-js";
 		}
 
 		// Add to any scripts.
