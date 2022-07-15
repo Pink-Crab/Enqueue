@@ -213,4 +213,14 @@ class Test_Enqueue extends WP_UnitTestCase {
 		$style = Enqueue::style( 'for_block' )->for_block( true );
 		$this->assertTrue( Objects::get_property( $style, 'for_block' ) );
 	}
+
+	/** @testdox It should be possible to register a script with custom types */
+	public function test_can_register_script_with_custom_types(): void {
+		$script = Enqueue::script( 'custom_type' )->script_type( 'custom_type' )->src('gg.js');
+		$this->assertEquals( 'custom_type', Objects::get_property( $script, 'script_type' ) );
+
+		// Default should be set
+		$script = Enqueue::script( 'custom_type' )->src('gg.js');
+		$this->assertEquals( 'text/javascript', Objects::get_property( $script, 'script_type' ) );
+	}
 }
