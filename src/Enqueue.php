@@ -422,7 +422,6 @@ class Enqueue {
 
 		$attributes = $this->get_script_attributes();
 
-
 		// Bail if we have no attributes.
 		if ( 0 === count( $this->get_attributes() ) && $this->script_type === 'text/javascript' ) {
 			return;
