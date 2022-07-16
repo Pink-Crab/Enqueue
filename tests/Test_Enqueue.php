@@ -19,10 +19,6 @@ use Gin0115\WPUnit_Helpers\Objects;
 class Test_Enqueue extends WP_UnitTestCase {
 
 
-	public function setUp() {
-
-	}
-
 	/**
 	 * Retruns a fully populated enqueue script isntance..
 	 *
@@ -216,5 +212,26 @@ class Test_Enqueue extends WP_UnitTestCase {
 		// Verbose true.
 		$style = Enqueue::style( 'for_block' )->for_block( true );
 		$this->assertTrue( Objects::get_property( $style, 'for_block' ) );
+	}
+
+	/** @testdox It should be possible to register a script with custom types */
+	public function test_can_register_script_with_custom_types(): void {
+		$script = Enqueue::script( 'custom_type' )->script_type( 'custom_type' )->src('gg.js');
+		$this->assertEquals( 'custom_type', Objects::get_property( $script, 'script_type' ) );
+
+		// Default should be set
+		$script = Enqueue::script( 'custom_type' )->src('gg.js');
+		$this->assertEquals( 'text/javascript', Objects::get_property( $script, 'script_type' ) );
+	}
+
+	/** @testdox Calling the old, mistyped lastest_version() should throw deprecation notice. */
+	public function test_calling_old_latest_version_should_throw_deprecation_notice(): void {
+		try {
+			Enqueue::script('ff')->lastest_version();
+		} catch (\Throwable $th) {
+			$this->assertStringContainsString('Enqueue::lastest_version', $th->getMessage());
+			$this->assertStringContainsString('is deprecated', $th->getMessage());
+		}
+
 	}
 }

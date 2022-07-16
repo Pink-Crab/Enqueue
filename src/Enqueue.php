@@ -34,7 +34,7 @@ class Enqueue {
 
 	/**
 	 * The handle to enqueue the script or style with.
-	 * Also used for any locaized variables.
+	 * Also used for any localised variables.
 	 *
 	 * @var string
 	 */
@@ -48,7 +48,7 @@ class Enqueue {
 	protected $type;
 
 	/**
-	 * The file loaction (URI)
+	 * The file location (URI)
 	 *
 	 * @var string
 	 */
@@ -113,6 +113,13 @@ class Enqueue {
 	protected $for_block = false;
 
 	/**
+	 * Denotes the script type.
+	 *
+	 * @var string
+	 */
+	protected $script_type = 'text/javascript';
+
+	/**
 	 * Creates an Enqueue instance.
 	 *
 	 * @param string $handle
@@ -124,7 +131,7 @@ class Enqueue {
 	}
 
 	/**
-	 * Creates a static instace of the Enqueue class for a script.
+	 * Creates a static instance of the Enqueue class for a script.
 	 *
 	 * @param string $handle
 	 * @return self
@@ -134,7 +141,7 @@ class Enqueue {
 	}
 
 	/**
-	 * Creates a static instace of the Enqueue class for a style.
+	 * Creates a static instance of the Enqueue class for a style.
 	 *
 	 * @param string $handle
 	 * @return self
@@ -161,7 +168,7 @@ class Enqueue {
 	 * @return self
 	 */
 	public function deps( string ...$deps ): self {
-		$this->deps = $deps;
+		$this->deps = array_values( $deps );
 		return $this;
 	}
 
@@ -188,15 +195,29 @@ class Enqueue {
 	}
 
 	/**
+	 * DEPRECATED DUE TO TYPO
+	 *
+	 * see latest_version()
+	 * @deprecated 1.3.0
+	 */
+	public function lastest_version():self {
+		trigger_error( 'Method ' . __METHOD__ . ' is deprecated', E_USER_DEPRECATED ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_trigger_error
+		return $this->latest_version();
+	}
+
+	/**
 	 * Sets the version as last modified file time.
 	 * Doesnt set the version if the fileheader can be read.
 	 *
 	 * @return self
 	 */
-	public function lastest_version(): self {
+	public function latest_version(): self {
 		if ( $this->does_file_exist( $this->src ) ) {
 
-			$headers = get_headers( $this->src, 1 );
+			// If php8 or above set as bool, else int
+			$associate = ( PHP_VERSION_ID >= 80000 ) ? true : 1;
+
+			$headers = get_headers( $this->src, $associate );
 
 			if ( is_array( $headers )
 			&& array_key_exists( 'Last-Modified', $headers )
@@ -410,10 +431,10 @@ class Enqueue {
 	 */
 	private function add_script_attributes(): void {
 
-		$attributes = $this->get_attributes();
+		$attributes = $this->get_script_attributes();
 
 		// Bail if we have no attributes.
-		if ( 0 === count( $attributes ) ) {
+		if ( 0 === count( $this->get_attributes() ) && $this->script_type === 'text/javascript' ) {
 			return;
 		}
 
@@ -425,11 +446,30 @@ class Enqueue {
 				if ( $this->handle !== $handle ) {
 					return $tag;
 				}
-				return sprintf( '<script type="text/javascript" src="%s" %s></script>', $source, join( ' ', $attributes ) ); //phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript
+				return sprintf( '<script type="%s" src="%s" %s></script>', $this->script_type, $source, join( ' ', $attributes ) ); //phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript
 			},
 			1,
 			3
 		);
+	}
+
+	/**
+	 * Adds the ID attribute if not set for script and script type is not text/javascript.
+	 *
+	 * @return string[]
+	 */
+	private function get_script_attributes(): array {
+		$attributes = $this->get_attributes();
+		// Loop through and look for any that start with 'id='
+		foreach ( $attributes as $key => $value ) {
+			if ( \strpos( $value, 'id=' ) === 0 ) {
+				return $attributes;
+			}
+		}
+
+		// Add to attributes
+		$attributes[] = \sprintf( "id='%s'", "{$this->handle}-js" );
+		return $attributes;
 	}
 
 	/**
@@ -468,6 +508,17 @@ class Enqueue {
 	}
 
 	/**
+	 * Set denotes the script type.
+	 *
+	 * @param string $script_type  Denotes the script type.
+	 * @return self
+	 */
+	public function script_type( string $script_type ) {
+		$this->script_type = $script_type;
+		return $this;
+	}
+
+	/**
 	 * Gets all attributes mapped as HTML attributes.
 	 *
 	 * @return string[]
@@ -483,6 +534,5 @@ class Enqueue {
 			$this->attributes
 		);
 	}
-
 
 }
