@@ -223,4 +223,15 @@ class Test_Enqueue extends WP_UnitTestCase {
 		$script = Enqueue::script( 'custom_type' )->src('gg.js');
 		$this->assertEquals( 'text/javascript', Objects::get_property( $script, 'script_type' ) );
 	}
+
+	/** @testdox Calling the old, mistyped lastest_version() should throw deprecation notice. */
+	public function test_calling_old_latest_version_should_throw_deprecation_notice(): void {
+		try {
+			Enqueue::script('ff')->lastest_version();
+		} catch (\Throwable $th) {
+			$this->assertStringContainsString('Enqueue::lastest_version', $th->getMessage());
+			$this->assertStringContainsString('is deprecated', $th->getMessage());
+		}
+
+	}
 }

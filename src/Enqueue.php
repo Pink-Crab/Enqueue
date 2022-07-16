@@ -34,7 +34,7 @@ class Enqueue {
 
 	/**
 	 * The handle to enqueue the script or style with.
-	 * Also used for any locaized variables.
+	 * Also used for any localised variables.
 	 *
 	 * @var string
 	 */
@@ -48,7 +48,7 @@ class Enqueue {
 	protected $type;
 
 	/**
-	 * The file loaction (URI)
+	 * The file location (URI)
 	 *
 	 * @var string
 	 */
@@ -131,7 +131,7 @@ class Enqueue {
 	}
 
 	/**
-	 * Creates a static instace of the Enqueue class for a script.
+	 * Creates a static instance of the Enqueue class for a script.
 	 *
 	 * @param string $handle
 	 * @return self
@@ -141,7 +141,7 @@ class Enqueue {
 	}
 
 	/**
-	 * Creates a static instace of the Enqueue class for a style.
+	 * Creates a static instance of the Enqueue class for a style.
 	 *
 	 * @param string $handle
 	 * @return self
@@ -195,12 +195,23 @@ class Enqueue {
 	}
 
 	/**
+	 * DEPRECATED DUE TO TYPO
+	 *
+	 * see latest_version()
+	 * @deprecated 1.3.0
+	 */
+	public function lastest_version():self {
+		trigger_error( 'Method ' . __METHOD__ . ' is deprecated', E_USER_DEPRECATED ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_trigger_error
+		return $this->latest_version();
+	}
+
+	/**
 	 * Sets the version as last modified file time.
 	 * Doesnt set the version if the fileheader can be read.
 	 *
 	 * @return self
 	 */
-	public function lastest_version(): self {
+	public function latest_version(): self {
 		if ( $this->does_file_exist( $this->src ) ) {
 
 			// If php8 or above set as bool, else int

@@ -1,6 +1,6 @@
 # PinkCrab Enqueue #
 
-![alt text](https://img.shields.io/badge/Current_Version-1.2.1-yellow.svg?style=flat " ") 
+![alt text](https://img.shields.io/badge/Current_Version-1.3.0-yellow.svg?style=flat " ") 
 [![Open Source Love](https://badges.frapsoft.com/os/mit/mit.svg?v=102)]()
 ![](https://github.com/Pink-Crab/Enqueue/workflows/GitHub_CI/badge.svg " ")
 [![codecov](https://codecov.io/gh/Pink-Crab/Enqueue/branch/master/graph/badge.svg?token=9O27LAKVWI)](https://codecov.io/gh/Pink-Crab/Enqueue) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Pink-Crab/Enqueue/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Pink-Crab/Enqueue/?branch=master)
@@ -14,7 +14,7 @@ composer require pinkcrab/enqueue
 ```
 
 ## Version ##
-**Release 1.2.1**
+**Release 1.3.0**
 
 
 
@@ -26,14 +26,14 @@ add_action('wp_enqueue_scripts', function(){
     Enqueue::script('My_Script')
         ->src('https://url.tld/wp-content/plugins/my_plugn/assets/js/my-script.js')
         ->deps('jquery')
-        ->lastest_version()
+        ->latest_version()
         ->register();
     
     // Enqueue a stylesheet
     Enqueue::style('My_Stylesheet')
         ->src('https://url.tld/wp-content/plugins/my_plugn/assets/css/my-stylesheet.css')
         ->media('all and (min-width: 1200px)')
-        ->lastest_version()
+        ->latest_version()
         ->register();
 });
 
@@ -101,7 +101,7 @@ Enqueue::script('my_script')
     ->ver('1.2.2') // Set to your current version number.
     ->register();
 ```
-However this can be fustrating while developing, so rather than using the current timestamp as a temp version. You can use the *lastest_version()*, this grabs the last modified date from the defined script or style sheet, allowing reducing the fustrations of caching during development. While this is really handy during development, it should be changed to **->ver('1.2.2')** when used in production.
+However this can be frustrating while developing, so rather than using the current timestamp as a temp version. You can use the *latest_version()*, this grabs the last modified date from the defined script or style sheet, allowing reducing the frustrations of caching during development. While this is really handy during development, it should be changed to **->ver('1.2.2')** when used in production.
 
 *This is the same for both styles and scripts*
 
@@ -109,7 +109,7 @@ However this can be fustrating while developing, so rather than using the curren
 <?php
 Enqueue::script('my_script')
     ->src(PLUGIN_BASE_URL . 'assets/js/my-script.js')
-    ->lastest_version() 
+    ->latest_version() 
 ```
 
 ### Dependencies  ###
@@ -126,9 +126,9 @@ Enqueue::script('my_script')
 
 
 ### Localized Values  ###
-One of the most useful parts of of enqueuing scripts in WordPress is passing values form the server to your javascript files. Where as using the regular functions, this requires registerign the style, localizing your data and then registering the script. While it works perfectly fine, it can be a bit on the verbose side. 
+One of the most useful parts of of enqueuing scripts in WordPress is passing values form the server to your javascript files. Where as using the regular functions, this requires registering the style, localizing your data and then registering the script. While it works perfectly fine, it can be a bit on the verbose side. 
 
-The locaize() method allows this all to be done within the single call.
+The localize() method allows this all to be done within the single call.
 
 *This can only be called for scripts*
 
@@ -142,14 +142,14 @@ Enqueue::script('MyScriptHandle')
     ])
     ->register();
 ```
-Useage within js file (my-script.js)
+Usage within js file (my-script.js)
 ```js
 console.log(MyScriptHandle.key1) // value1
 console.log(MyScriptHandle.key2) // value2
 ```
 
 ### Footer  ###
-By defualt all scripts are enqueued in the footer, but this can be changed if it needs to be called in the head. By calling either *footer(false)* or *header()*
+By default all scripts are enqueued in the footer, but this can be changed if it needs to be called in the head. By calling either *footer(false)* or *header()*
 
 *This can only be called for scripts*
 
@@ -167,7 +167,7 @@ Enqueue::script('my_script')
 
 ```
 ### Media  ###
-As with wp_enqueue_style() you can specifiy the media for which the sheet is defined for. Accepts all the same values as wp_enqueue_style()
+As with wp_enqueue_style() you can specify the media for which the sheet is defined for. Accepts all the same values as wp_enqueue_style()
 
 *This can only be called for styles*
 
@@ -204,7 +204,7 @@ Enqueue::script('my_style')
 // <script src="http://www.site.com/my-scripts.js" key type="text/javascript"></script>
 ```
 ### Async & Defer ###
-There is also some shortcuts for making any script or style be defered or async tagged.
+There is also some shortcuts for making any script or style be deferred or async tagged.
 ```php
 <?php
 Enqueue::style('my_style')
@@ -229,7 +229,7 @@ Enqueue::script('my_style')
 ```
 
 ### Registration  ###
-Once your Enqueue object has been populted all you need to call **register()** for wp_enqueue_script() or wp_enqueue_style() to be called. You can either do all this inline (like the first example) or the Enqueue object can be populated and only called when required.
+Once your Enqueue object has been populated all you need to call **register()** for wp_enqueue_script() or wp_enqueue_style() to be called. You can either do all this inline (like the first example) or the Enqueue object can be populated and only called when required.
 
 *This is the same for both styles and scripts*
 
@@ -237,7 +237,7 @@ Once your Enqueue object has been populted all you need to call **register()** f
 <?php
 class My_Thingy{
     /**
-     * Reutrns a partly finalised Enqueue scripts, with defined url.
+     * Returns a partly finalised Enqueue scripts, with defined url.
      * 
      * @param string $script The file location.
      * @return Enqueue The populated enqueue object.
@@ -246,12 +246,12 @@ class My_Thingy{
         return Enqueue::script('My_Script')
             ->src($script)
             ->deps('jquery')
-            ->lastest_version();
+            ->latest_version();
     } 
 
     /**
-     * Called to initalise the class.
-     * Registers our JS based on a constitional.
+     * Called to initialize the class.
+     * Registers our JS based on a conditional.
      * 
      * @return void
      */
@@ -273,7 +273,7 @@ add_action('wp_loaded', [new My_Thingy, 'init']);
 
 ## Gutenberg ##
 
-When registering scripts and styles for use with Gutenberg blocks, it is necessery to only register the assets before `wp_enqueue_scripts` hook is called. To do this, all you need to is set `for_block()`.
+When registering scripts and styles for use with Gutenberg blocks, it is necessary to only register the assets before `wp_enqueue_scripts` hook is called. To do this, all you need to is set `for_block()`.
 
 ```php
 add_action('init', function(){
@@ -299,7 +299,7 @@ add_action('init', function(){
  public function __construct( string $handle, string $type )
 
 /**
-  * Creates a static instace of the Enqueue class for a script.
+  * Creates a static instance of the Enqueue class for a script.
   *
   * @param string $handle
   * @return self
@@ -307,7 +307,7 @@ add_action('init', function(){
  public static function script( string $handle ): self
 
 /**
-  * Creates a static instace of the Enqueue class for a style.
+  * Creates a static instance of the Enqueue class for a style.
   *
   * @param string $handle
   * @return self
@@ -409,12 +409,20 @@ add_action('init', function(){
  public function async(): self 
 
 /**
+ * Set denotes the script type.
+ *
+ * @param string $script_type  Denotes the script type.
+ * @return self
+ */
+public function script_type( string $script_type ): self
+
+/**
   * Set if being enqueued for a block.
   *
   * @param bool $for_block Denotes if being enqueued for a block.
   * @return self
   */
- public function for_block( bool $for_block = true ) : self
+ public function for_block( bool $for_block = true ): self
 
 /**
   * Registers the file as either enqueued or inline parsed.
@@ -427,7 +435,7 @@ add_action('init', function(){
 This obviously can be passed around between different classes/functions
 
 ### Changelog ###
-* 1.3.0 - Updated for php8, includes setting of custom script types
+* 1.3.0 - Updated for php8, includes setting of custom script types, renamed lastest_version() to latest_version() and set deprecation notice.
 * 1.2.1 : Now supports block use. If defined for block, scripts and styles will only be registered, not enqueued.
 * 1.2.0 : Added in Attribute and Flag support with helpers for Aysnc and Defer 
 
