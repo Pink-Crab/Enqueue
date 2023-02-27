@@ -35,7 +35,7 @@
         "yoast/phpunit-polyfills": "^0.2.0 || ^1.0.0",
         "symfony/var-dumper": "4.*",
         "pinkcrab/wp-rest-schema": "dev-master",
-        "gin0115/wpunit-helpers": "~1.0.0",
+        "gin0115/wpunit-helpers": "~1.0.0 || ~1.1.0",
         "symfony/css-selector": "*",
         "symfony/dom-crawler": "*",
         "pinkcrab/function-constructors": "*"
