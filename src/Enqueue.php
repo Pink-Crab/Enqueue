@@ -238,7 +238,12 @@ class Enqueue {
 	 * @return boolean true if it does, false if it doesnt.
 	 */
 	private function does_file_exist( string $url ): bool {
-		$ch = @curl_init( $url ); //phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		try {
+			$ch = @curl_init( $url ); //phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		} catch ( \Exception $e ) {
+			return false;
+		}
+
 		if ( ! $ch ) {
 			return false;
 		}
@@ -411,7 +416,6 @@ class Enqueue {
 
 		// Maybe add as an inline script.
 		if ( $this->inline && $this->does_file_exist( $this->src ) ) {
-			dump('..' . PHP_EOL);
 			\wp_add_inline_script( $this->handle, file_get_contents( $this->src ) ?: '' );
 		}
 
