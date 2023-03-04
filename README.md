@@ -1,9 +1,9 @@
 # PinkCrab Enqueue #
 
-[![Latest Stable Version](http://poser.pugx.org/pinkcrab/pinkcrab/enqueue/v)](https://packagist.org/packages/pinkcrab/pinkcrab/enqueue)
-[![Total Downloads](http://poser.pugx.org/pinkcrab/pinkcrab/enqueue/downloads)](https://packagist.org/packages/pinkcrab/pinkcrab/enqueue) 
-[![License](http://poser.pugx.org/pinkcrab/pinkcrab/enqueue/license)](https://packagist.org/packages/pinkcrab/pinkcrab/enqueue)
-[![PHP Version Require](http://poser.pugx.org/pinkcrab/pinkcrab/enqueue/require/php)](https://packagist.org/packages/pinkcrab/pinkcrab/enqueue)
+[![Latest Stable Version](http://poser.pugx.org/pinkcrab/enqueue/v)](https://packagist.org/packages/pinkcrab/enqueue)
+[![Total Downloads](http://poser.pugx.org/pinkcrab/enqueue/downloads)](https://packagist.org/packages/pinkcrab/enqueue) 
+[![License](http://poser.pugx.org/pinkcrab/enqueue/license)](https://packagist.org/packages/pinkcrab/enqueue)
+[![PHP Version Require](http://poser.pugx.org/pinkcrab/enqueue/require/php)](https://packagist.org/packages/pinkcrab/enqueue)
 ![GitHub contributors](https://img.shields.io/github/contributors/Pink-Crab/Enqueue?label=Contributors)
 ![GitHub issues](https://img.shields.io/github/issues-raw/Pink-Crab/Enqueue)
 [![WP5.9 Test Suite [PHP7.2-8.1]](https://github.com/Pink-Crab/Enqueue/actions/workflows/WP_5_9.yaml/badge.svg)](https://github.com/Pink-Crab/Enqueue/actions/workflows/WP_5_9.yaml)[![WP6.0 Test Suite [PHP7.2-8.1]](https://github.com/Pink-Crab/Enqueue/actions/workflows/WP_6_0.yaml/badge.svg)](https://github.com/Pink-Crab/Enqueue/actions/workflows/WP_6_0.yaml)[![WP6.1 [PHP7.2-8.1] Tests](https://github.com/Pink-Crab/Enqueue/actions/workflows/WP_6_1.yaml/badge.svg)](https://github.com/Pink-Crab/Enqueue/actions/workflows/WP_6_1.yaml)
