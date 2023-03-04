@@ -3,6 +3,7 @@
 ![alt text](https://img.shields.io/badge/Current_Version-1.3.0-yellow.svg?style=flat " ") 
 [![Open Source Love](https://badges.frapsoft.com/os/mit/mit.svg?v=102)]()
 ![](https://github.com/Pink-Crab/Enqueue/workflows/GitHub_CI/badge.svg " ")
+[![WP5.9 Test Suite [PHP7.2-8.1]](https://github.com/Pink-Crab/Enqueue/actions/workflows/WP_5_9.yaml/badge.svg)](https://github.com/Pink-Crab/Enqueue/actions/workflows/WP_5_9.yaml)[![WP6.0 Test Suite [PHP7.2-8.1]](https://github.com/Pink-Crab/Enqueue/actions/workflows/WP_6_0.yaml/badge.svg)](https://github.com/Pink-Crab/Enqueue/actions/workflows/WP_6_0.yaml)[![WP6.1 [PHP7.2-8.1] Tests](https://github.com/Pink-Crab/Enqueue/actions/workflows/WP_6_1.yaml/badge.svg)](https://github.com/Pink-Crab/Enqueue/actions/workflows/WP_6_1.yaml)
 [![codecov](https://codecov.io/gh/Pink-Crab/Enqueue/branch/master/graph/badge.svg?token=9O27LAKVWI)](https://codecov.io/gh/Pink-Crab/Enqueue) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Pink-Crab/Enqueue/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Pink-Crab/Enqueue/?branch=master)
 [![Maintainability](https://api.codeclimate.com/v1/badges/cbf72c7619f39ea64d2b/maintainability)](https://codeclimate.com/github/Pink-Crab/Enqueue/maintainability)
 
