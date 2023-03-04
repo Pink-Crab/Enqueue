@@ -4,6 +4,7 @@
 [![Open Source Love](https://badges.frapsoft.com/os/mit/mit.svg?v=102)]()
 ![](https://github.com/Pink-Crab/Enqueue/workflows/GitHub_CI/badge.svg " ")
 [![codecov](https://codecov.io/gh/Pink-Crab/Enqueue/branch/master/graph/badge.svg?token=9O27LAKVWI)](https://codecov.io/gh/Pink-Crab/Enqueue) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Pink-Crab/Enqueue/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Pink-Crab/Enqueue/?branch=master)
+[![Maintainability](https://api.codeclimate.com/v1/badges/cbf72c7619f39ea64d2b/maintainability)](https://codeclimate.com/github/Pink-Crab/Enqueue/maintainability)
 
 
 The PinkCrab Enqueue class allows for a clean and fluent alternative for enqueuing scripts and styles in WordPress.
