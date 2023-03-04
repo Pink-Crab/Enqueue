@@ -24,6 +24,8 @@ declare(strict_types=1);
 
 namespace PinkCrab\Enqueue;
 
+use PHP_CodeSniffer\Tokenizers\PHP;
+
 /**
  * WordPress Script and Style enqueuing class.
  *
@@ -199,6 +201,7 @@ class Enqueue {
 	 *
 	 * see latest_version()
 	 * @deprecated 1.3.0
+	 * @codeCoverageIgnore
 	 */
 	public function lastest_version():self {
 		trigger_error( 'Method ' . __METHOD__ . ' is deprecated', E_USER_DEPRECATED ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_trigger_error
@@ -235,12 +238,12 @@ class Enqueue {
 	 * @return boolean true if it does, false if it doesnt.
 	 */
 	private function does_file_exist( string $url ): bool {
-		$ch = curl_init( $url );
+		$ch = @curl_init( $url ); //phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 		if ( ! $ch ) {
 			return false;
 		}
 		curl_setopt( $ch, CURLOPT_NOBODY, true );
-		curl_setopt( $ch, CURLOPT_TIMEOUT_MS, 50 );
+		curl_setopt( $ch, CURLOPT_TIMEOUT_MS, 250 );
 		curl_exec( $ch );
 		$http_code = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
 		curl_close( $ch );
@@ -408,6 +411,7 @@ class Enqueue {
 
 		// Maybe add as an inline script.
 		if ( $this->inline && $this->does_file_exist( $this->src ) ) {
+			dump('..' . PHP_EOL);
 			\wp_add_inline_script( $this->handle, file_get_contents( $this->src ) ?: '' );
 		}
 

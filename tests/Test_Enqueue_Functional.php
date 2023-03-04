@@ -95,7 +95,6 @@ class Test_Enqueue_Functional extends \WP_UnitTestCase {
 		$header_html = Output::buffer(
 			function() {
 				do_action( 'init' );
-				do_action( 'wp_enqueue_scripts' );
 				do_action( 'wp_head' );
 			}
 		);
@@ -161,7 +160,6 @@ class Test_Enqueue_Functional extends \WP_UnitTestCase {
 		$header_html = Output::buffer(
 			function() {
 				do_action( 'init' );
-				do_action( 'wp_enqueue_scripts' );
 				do_action( 'wp_head' );
 			}
 		);
@@ -201,7 +199,6 @@ class Test_Enqueue_Functional extends \WP_UnitTestCase {
 		$header_html = Output::buffer(
 			function() {
 				do_action( 'init' );
-				do_action( 'wp_enqueue_scripts' );
 				do_action( 'wp_head' );
 			}
 		);
@@ -238,7 +235,6 @@ class Test_Enqueue_Functional extends \WP_UnitTestCase {
 		$header_html = Output::buffer(
 			function() {
 				do_action( 'init' );
-				do_action( 'wp_enqueue_scripts' );
 				do_action( 'wp_head' );
 			}
 		);
@@ -275,7 +271,6 @@ class Test_Enqueue_Functional extends \WP_UnitTestCase {
 		Output::buffer(
 			function() {
 				do_action( 'init' );
-				do_action( 'wp_enqueue_scripts' );
 				do_action( 'wp_head' );
 			}
 		);
@@ -302,7 +297,6 @@ class Test_Enqueue_Functional extends \WP_UnitTestCase {
 		Output::buffer(
 			function() {
 				do_action( 'init' );
-				do_action( 'wp_enqueue_scripts' );
 				do_action( 'wp_head' );
 			}
 		);
@@ -333,7 +327,6 @@ class Test_Enqueue_Functional extends \WP_UnitTestCase {
 		$header_html = Output::buffer(
 			function() {
 				do_action( 'init' );
-				do_action( 'wp_enqueue_scripts' );
 				do_action( 'wp_head' );
 			}
 		);
@@ -351,17 +344,17 @@ class Test_Enqueue_Functional extends \WP_UnitTestCase {
 		$this->assertEquals( 'https://url.com/Fixtures/as_module.js?ver=1.1.1', $script['src'] );
 	}
 
-	/** 
+	/**
 	 * @testdox If no attributes are defined and no custom type is set, the script_loader_tag filter should not be added.
 	  * @_runInSeparateProcess
  * @_preserveGlobalState disabled
 	 */
 	public function test_no_script_loader_tag_filter_added_if_no_attributes_and_no_custom_type(): void {
-		
+
 		// Ensure no other scripts are queued up
 		do_action( 'init' );
 		unset( $GLOBALS['wp_filter']['wp_enqueue_scripts'] );
-		
+
 		// Enqueue
 		add_action(
 			'wp_enqueue_scripts',
@@ -376,13 +369,12 @@ class Test_Enqueue_Functional extends \WP_UnitTestCase {
 		// Run and get all styles for header
 		$header_html = Output::buffer(
 			function() {
-				
+
 				do_action( 'wp_enqueue_scripts' );
 				unset( $GLOBALS['wp_filter']['script_loader_tag'] );
 				do_action( 'wp_head' );
 			}
 		);
-
 
 		// The filter should not be added.
 		$this->assertArrayNotHasKey( 'script_loader_tag', $GLOBALS['wp_filter'] );
@@ -408,7 +400,6 @@ class Test_Enqueue_Functional extends \WP_UnitTestCase {
 		$header_html = Output::buffer(
 			function() {
 				do_action( 'init' );
-				do_action( 'wp_enqueue_scripts' );
 				do_action( 'wp_head' );
 			}
 		);
@@ -424,5 +415,111 @@ class Test_Enqueue_Functional extends \WP_UnitTestCase {
 		// Check the type is set as custom.
 		$this->assertEquals( 'custom', $script['type'] );
 		$this->assertEquals( 'https://url.com/Fixtures/manual_id.js?ver=1.1.1', $script['src'] );
+	}
+
+	/** @testdox It should be possible to set the version based on the last modified date of the file */
+	public function test_version_set_to_last_modified_date(): void {
+		// Enqueue
+		add_action(
+			'wp_enqueue_scripts',
+			function() {
+				Enqueue::script( 'script_last_modified' )
+					->src( 'https://code.jquery.com/jquery-2.2.4.js' )
+					->header()
+					->latest_version()
+					->register();
+			}
+		);
+
+		// Run and get all styles for header
+		$header_html = Output::buffer(
+			function() {
+				do_action( 'init' );
+				do_action( 'wp_head' );
+			}
+		);
+
+		// Attempt to find script in header, should not exist.
+		$script = Arr\filterFirst(
+			Comp\all(
+				Func\hasProperty( 'id' ),
+				Func\propertyEquals( 'id', 'script_last_modified-js' )
+			)
+		)( $this->get_all_script_tags( $header_html ) );
+
+		// Get the version from the src
+		$version = preg_replace( '/.*ver=([0-9]+).*/', '$1', $script['src'] );
+
+		// Check the version is a timestamp greater than  10th Oct 1991
+		$this->assertGreaterThan( 681484800, $version );
+
+		// Check the version is a timestamp less than now
+		$this->assertLessThan( time(), $version );
+	}
+
+	/** @testdox Assert that if remove file doesnt exist, the default version is used. */
+	public function test_remove_file_doesnt_exist(): void {
+		// Enqueue
+		add_action(
+			'wp_enqueue_scripts',
+			function() {
+				Enqueue::script( 'script_remove_file_doesnt_exist' )
+					->src( "\0" )
+					->header()
+					->latest_version()
+					->register();
+			}
+		);
+
+		// Run and get all styles for header
+		$header_html = Output::buffer(
+			function() {
+				do_action( 'init' );
+				do_action( 'wp_head' );
+			}
+		);
+
+		// Attempt to find script in header, should not exist.
+		$script = Arr\filterFirst(
+			Comp\all(
+				Func\hasProperty( 'id' ),
+				Func\propertyEquals( 'id', 'script_remove_file_doesnt_exist-js' )
+			)
+		)( $this->get_all_script_tags( $header_html ) );
+
+		// Get all after ver=
+		$version = preg_replace( '/.*ver=(.+).*/', '$1', $script['src'] );
+
+		// Check the version matches the current WP version.
+		$this->assertEquals( get_bloginfo( 'version' ), $version );
+	}
+
+	/** @testdox It should be possible to enqueue a script and have it just printed between script tags in the markup */
+	public function test_enqueue_script_and_print_between_script_tags(): void {
+		// Enqueue
+		add_action(
+			'wp_enqueue_scripts',
+			function() {
+				Enqueue::script( 'script_print_between_script_tags' )
+					->src( 'https://gist.githubusercontent.com/gin0115/6419abd796449186a972515033ad0ab4/raw/750df6b0b7666567d3a323510351af4bbadd10f5/test.js' )
+					->header()
+					->inline()
+					->register();
+			}
+		);
+
+		// Run and get all styles for header
+		$header_html = Output::buffer(
+			function() {
+				do_action( 'init' );
+				do_action( 'wp_head' );
+			}
+		);
+;
+
+		// Header should contain a script tage with an id of script_print_between_script_tags-js
+		$this->assertStringContainsString( "'script_print_between_script_tags-js-after'", $header_html );
+		// Header should contain the content of the script const TEST="file"
+		$this->assertStringContainsString( 'const TEST="file"', $header_html );
 	}
 }
