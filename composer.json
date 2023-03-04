@@ -35,6 +35,8 @@
         "symfony/var-dumper": "<=6.2.7",
         "gin0115/wpunit-helpers": "1.1.*",
         "vlucas/phpdotenv": "<=5.5.0",
+        "symfony/css-selector": "*",
+        "symfony/dom-crawler": "*",
         "pinkcrab/function-constructors": "0.2.*"
     },
     "require": {
