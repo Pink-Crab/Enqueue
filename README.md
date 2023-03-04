@@ -1,8 +1,11 @@
 # PinkCrab Enqueue #
 
-![alt text](https://img.shields.io/badge/Current_Version-1.3.0-yellow.svg?style=flat " ") 
-[![Open Source Love](https://badges.frapsoft.com/os/mit/mit.svg?v=102)]()
-![](https://github.com/Pink-Crab/Enqueue/workflows/GitHub_CI/badge.svg " ")
+[![Latest Stable Version](http://poser.pugx.org/pinkcrab/pinkcrab/enqueue/v)](https://packagist.org/packages/pinkcrab/pinkcrab/enqueue)
+[![Total Downloads](http://poser.pugx.org/pinkcrab/pinkcrab/enqueue/downloads)](https://packagist.org/packages/pinkcrab/pinkcrab/enqueue) 
+[![License](http://poser.pugx.org/pinkcrab/pinkcrab/enqueue/license)](https://packagist.org/packages/pinkcrab/pinkcrab/enqueue)
+[![PHP Version Require](http://poser.pugx.org/pinkcrab/pinkcrab/enqueue/require/php)](https://packagist.org/packages/pinkcrab/pinkcrab/enqueue)
+![GitHub contributors](https://img.shields.io/github/contributors/Pink-Crab/Enqueue?label=Contributors)
+![GitHub issues](https://img.shields.io/github/issues-raw/Pink-Crab/Enqueue)
 [![WP5.9 Test Suite [PHP7.2-8.1]](https://github.com/Pink-Crab/Enqueue/actions/workflows/WP_5_9.yaml/badge.svg)](https://github.com/Pink-Crab/Enqueue/actions/workflows/WP_5_9.yaml)[![WP6.0 Test Suite [PHP7.2-8.1]](https://github.com/Pink-Crab/Enqueue/actions/workflows/WP_6_0.yaml/badge.svg)](https://github.com/Pink-Crab/Enqueue/actions/workflows/WP_6_0.yaml)[![WP6.1 [PHP7.2-8.1] Tests](https://github.com/Pink-Crab/Enqueue/actions/workflows/WP_6_1.yaml/badge.svg)](https://github.com/Pink-Crab/Enqueue/actions/workflows/WP_6_1.yaml)
 [![codecov](https://codecov.io/gh/Pink-Crab/Enqueue/branch/master/graph/badge.svg?token=9O27LAKVWI)](https://codecov.io/gh/Pink-Crab/Enqueue) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Pink-Crab/Enqueue/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Pink-Crab/Enqueue/?branch=master)
 [![Maintainability](https://api.codeclimate.com/v1/badges/cbf72c7619f39ea64d2b/maintainability)](https://codeclimate.com/github/Pink-Crab/Enqueue/maintainability)
