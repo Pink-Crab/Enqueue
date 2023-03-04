@@ -5,3 +5,5 @@ coverage-report
 clover.xml
 workspace.code-workspace
 .phpunit.result.cache
+tests/.env
+.vscode
