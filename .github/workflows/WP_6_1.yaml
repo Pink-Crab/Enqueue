@@ -1,8 +1,8 @@
-name: GitHub_CI
+name: WP6.1 [PHP7.2-8.1] Tests
 
 on:
   push:
-    branches: [ master, develop ]
+    branches: [ master ]
   pull_request:
     branches: [ master, develop ]
 
@@ -11,12 +11,12 @@ jobs:
     strategy:
       matrix:
         operating-system: [ubuntu-latest]
-        php-versions: ['7.1', '7.2', '7.3', '7.4', '8.0', '8.1']
+        php-versions: ['7.2', '7.3', '7.4', '8.0', '8.1']
     runs-on: ${{ matrix.operating-system }}
     services:
       # Setup MYSQL
       mysql-service:
-        image: mysql:5.7
+        image: 'mysql:5.7'
         env:
           MYSQL_ROOT_PASSWORD: 'crab'
           MYSQL_DATABASE: pc_core_tests
@@ -27,6 +27,7 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
+  
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -42,20 +43,25 @@ jobs:
         run: php -v
 
       - name: Clear existing composer
-        run: rm -rf wordpress && rm -rf vendor && rm -rf composer.lock 
-
+        run: >
+          sudo rm -rf vendor 
+          && rm -rf composer.lock 
       - name: Validate composer.json and composer.lock
         run: composer validate
 
       - name: Install dependencies
-        run: composer clearcache && rm -rf composer.lock && composer install --prefer-dist --no-suggest
+        run: >
+          rm -rf composer.lock 
+          && composer clearcache
+          && composer require php-stubs/wordpress-stubs:6.1.0 --dev --no-update
+          && composer require roots/wordpress:6.* --dev --no-update
+          && composer update --no-cache
 
-      - name: Run Tests
+      - name: Run Tests on Latest Version - WP6.1
         env:
           environment_github: true
         run: composer all
 
       - name: Codecov
         run: bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_TOKEN }}
-
-      
+ 
