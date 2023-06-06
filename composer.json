@@ -31,7 +31,7 @@
         "wp-phpunit/wp-phpunit": "6.1.*",
         "dealerdirect/phpcodesniffer-composer-installer": "<=1.0.0",
         "wp-coding-standards/wpcs": "<=2.3.0",
-        "yoast/phpunit-polyfills": "^0.2.0 || ^1.0.0",
+        "yoast/phpunit-polyfills": "^0.2.0 || ^1.0.0 || ^2.0.0",
         "symfony/var-dumper": "<=6.2.7",
         "gin0115/wpunit-helpers": "1.1.*",
         "vlucas/phpdotenv": "<=5.5.0",
