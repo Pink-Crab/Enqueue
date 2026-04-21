@@ -1,0 +1,12 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "pinkcrab-enqueue/test-block",
+  "title": "PinkCrab Enqueue Test Block",
+  "category": "widgets",
+  "description": "Fixture block for PinkCrab Enqueue integration tests.",
+  "textdomain": "pinkcrab-enqueue-test",
+  "supports": {
+    "html": false
+  }
+}

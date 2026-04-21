@@ -120,6 +120,62 @@ class Enqueue {
 	protected $script_type = 'text/javascript';
 
 	/**
+	 * Script translations domain + optional path for wp_set_script_translations().
+	 *
+	 * @var array{domain: string, path: string|null}|null
+	 */
+	protected $translations = null;
+
+	/**
+	 * Inline script snippets to attach to the handle via wp_add_inline_script().
+	 *
+	 * @var array<int, array{code: string, position: string}>
+	 */
+	protected $inline_scripts = array();
+
+	/**
+	 * Inline CSS strings to attach to the handle via wp_add_inline_style().
+	 *
+	 * @var array<int, string>
+	 */
+	protected $inline_styles = array();
+
+	/**
+	 * Defer/async strategy forwarded to wp_script_add_data( $handle, 'strategy', $strategy ).
+	 *
+	 * @var string|null
+	 */
+	protected $strategy = null;
+
+	/**
+	 * When true, register() attaches the registration/enqueue flow to enqueue_block_editor_assets.
+	 *
+	 * @var bool
+	 */
+	protected $for_block_editor = false;
+
+	/**
+	 * When set, register_style() calls wp_enqueue_block_style() against this block name.
+	 *
+	 * @var string|null
+	 */
+	protected $block_name = null;
+
+	/**
+	 * Register the asset with WP but do not enqueue it. Handle remains available for deps.
+	 *
+	 * @var bool
+	 */
+	protected $register_only = false;
+
+	/**
+	 * Path to a block.json directory for register_block_type_from_metadata().
+	 *
+	 * @var string|null
+	 */
+	protected $block_json_path = null;
+
+	/**
 	 * Creates an Enqueue instance.
 	 *
 	 * @param string $handle
@@ -195,13 +251,27 @@ class Enqueue {
 	}
 
 	/**
+	 * Attaches an inline CSS snippet to the registered style handle.
+	 *
+	 * Calls stack — each call adds another entry. Only applies to styles; a
+	 * silent no-op on a script Enqueue.
+	 *
+	 * @param string $css CSS source.
+	 * @return self
+	 */
+	public function with_style( string $css ): self {
+		$this->inline_styles[] = $css;
+		return $this;
+	}
+
+	/**
 	 * DEPRECATED DUE TO TYPO
 	 *
 	 * see latest_version()
 	 * @deprecated 1.3.0
 	 */
-	public function lastest_version():self {
-		trigger_error( 'Method ' . __METHOD__ . ' is deprecated', E_USER_DEPRECATED ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_trigger_error
+	public function lastest_version(): self {
+		_deprecated_function( __METHOD__, '1.3.0', __CLASS__ . '::latest_version()' );
 		return $this->latest_version();
 	}
 
@@ -212,18 +282,21 @@ class Enqueue {
 	 * @return self
 	 */
 	public function latest_version(): self {
-		if ( $this->does_file_exist( $this->src ) ) {
+		if ( empty( $this->src ) ) {
+			return $this;
+		}
 
-			// If php8 or above set as bool, else int
-			$associate = ( PHP_VERSION_ID >= 80000 ) ? true : 1;
+		$response = \wp_remote_head( $this->src, array( 'timeout' => 1 ) );
+		if ( \is_wp_error( $response ) || \wp_remote_retrieve_response_code( $response ) !== 200 ) {
+			return $this;
+		}
 
-			$headers = get_headers( $this->src, $associate );
-
-			if ( is_array( $headers )
-			&& array_key_exists( 'Last-Modified', $headers )
-			) {
-				$this->ver = strtotime( $headers['Last-Modified'] );
-			}
+		$last_modified = \wp_remote_retrieve_header( $response, 'last-modified' );
+		if ( is_array( $last_modified ) ) {
+			$last_modified = end( $last_modified );
+		}
+		if ( ! empty( $last_modified ) ) {
+			$this->ver = strtotime( (string) $last_modified );
 		}
 		return $this;
 	}
@@ -231,20 +304,18 @@ class Enqueue {
 	/**
 	 * Checks to see if a file exist using URL (not path).
 	 *
+	 * Uses wp_remote_head() so test mocks via the pre_http_request filter can
+	 * fake the response without a real network round-trip.
+	 *
 	 * @param string $url The URL of the file being checked.
 	 * @return boolean true if it does, false if it doesnt.
 	 */
 	private function does_file_exist( string $url ): bool {
-		$ch = curl_init( $url );
-		if ( ! $ch ) {
+		$response = \wp_remote_head( $url, array( 'timeout' => 1 ) );
+		if ( \is_wp_error( $response ) ) {
 			return false;
 		}
-		curl_setopt( $ch, CURLOPT_NOBODY, true );
-		curl_setopt( $ch, CURLOPT_TIMEOUT_MS, 50 );
-		curl_exec( $ch );
-		$http_code = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
-		curl_close( $ch );
-		return $http_code === 200;
+		return \wp_remote_retrieve_response_code( $response ) === 200;
 	}
 
 	/**
@@ -274,7 +345,7 @@ class Enqueue {
 	 * @param boolean $inline
 	 * @return self
 	 */
-	public function inline( bool $inline = true ):self {
+	public function inline( bool $inline = true ): self {
 		$this->inline = $inline;
 		return $this;
 	}
@@ -287,6 +358,43 @@ class Enqueue {
 	 */
 	public function localize( array $args ): self {
 		$this->localize = $args;
+		return $this;
+	}
+
+	/**
+	 * Registers the script for translation via wp_set_script_translations().
+	 *
+	 * Only applies to scripts. On a style Enqueue this is a silent no-op so
+	 * fluent chains don't need to branch.
+	 *
+	 * @param string      $domain Text domain.
+	 * @param string|null $path   Optional path to the JSON translation files.
+	 * @return self
+	 */
+	public function translations( string $domain, ?string $path = null ): self {
+		$this->translations = array(
+			'domain' => $domain,
+			'path'   => $path,
+		);
+		return $this;
+	}
+
+	/**
+	 * Attaches an inline JavaScript snippet to the registered handle.
+	 *
+	 * Calls stack — each call adds another entry. `$position` is `'before'` or
+	 * `'after'` (matching wp_add_inline_script). Only applies to scripts; a
+	 * silent no-op on a style Enqueue.
+	 *
+	 * @param string $code     JavaScript source.
+	 * @param string $position 'before' or 'after'. Default 'after'.
+	 * @return self
+	 */
+	public function with_code( string $code, string $position = 'after' ): self {
+		$this->inline_scripts[] = array(
+			'code'     => $code,
+			'position' => $position,
+		);
 		return $this;
 	}
 
@@ -314,32 +422,28 @@ class Enqueue {
 	}
 
 	/**
-	 * Marks the script or style as deferred loaded.
+	 * Marks the script as deferred loaded.
+	 *
+	 * Uses WordPress 6.3+'s dep-aware script strategy via wp_script_add_data()
+	 * instead of splatting the attribute through the script_loader_tag filter.
 	 *
 	 * @return self
 	 */
 	public function defer(): self {
-		// Remove ASYNC if set.
-		if ( \array_key_exists( 'async', $this->attributes ) ) {
-			unset( $this->attributes['async'] );
-		}
-
-		$this->attributes['defer'] = '';
+		$this->strategy = 'defer';
 		return $this;
 	}
 
 	/**
-	 * Marks the script or style as async loaded.
+	 * Marks the script as async loaded.
+	 *
+	 * Uses WordPress 6.3+'s dep-aware script strategy via wp_script_add_data()
+	 * instead of splatting the attribute through the script_loader_tag filter.
 	 *
 	 * @return self
 	 */
 	public function async(): self {
-		// Remove DEFER if set.
-		if ( \array_key_exists( 'defer', $this->attributes ) ) {
-			unset( $this->attributes['defer'] );
-		}
-
-		$this->attributes['async'] = '';
+		$this->strategy = 'async';
 		return $this;
 	}
 
@@ -349,8 +453,69 @@ class Enqueue {
 	 * @param bool $for_block Denotes if being enqueued for a block.
 	 * @return self
 	 */
-	public function for_block( bool $for_block = true ) : self {
+	public function for_block( bool $for_block = true ): self {
 		$this->for_block = $for_block;
+		return $this;
+	}
+
+	/**
+	 * Defer the registration/enqueue to the enqueue_block_editor_assets hook.
+	 *
+	 * When set, calling register() attaches the rest of the flow to the block
+	 * editor hook instead of running immediately. Use for scripts/styles that
+	 * should only load inside the admin block editor.
+	 *
+	 * @param bool $for_block_editor Default true.
+	 * @return self
+	 */
+	public function for_block_editor( bool $for_block_editor = true ): self {
+		$this->for_block_editor = $for_block_editor;
+		return $this;
+	}
+
+	/**
+	 * Attach the style to a named block via wp_enqueue_block_style().
+	 *
+	 * Only applies to styles. When set, register_style() calls
+	 * wp_enqueue_block_style() against the block so the stylesheet loads only
+	 * when the block is rendered on the front-end.
+	 *
+	 * @param string $block_name Block name (e.g. 'core/paragraph' or 'my-plugin/my-block').
+	 * @return self
+	 */
+	public function for_block_style( string $block_name ): self {
+		$this->block_name = $block_name;
+		return $this;
+	}
+
+	/**
+	 * Register the asset with WP without enqueueing it.
+	 *
+	 * Useful when another handle will reference this one via a dep array, or
+	 * when a block's block.json names it. Keeps the handle available without
+	 * emitting it on every page.
+	 *
+	 * @param bool $register_only Default true.
+	 * @return self
+	 */
+	public function register_only( bool $register_only = true ): self {
+		$this->register_only = $register_only;
+		return $this;
+	}
+
+	/**
+	 * Register a block type from a block.json metadata directory.
+	 *
+	 * When set, register() short-circuits to register_block_type_from_metadata()
+	 * instead of the normal script/style registration path. The handle / src /
+	 * deps / ver passed via the fluent API are ignored — block.json is the
+	 * source of truth for asset declarations.
+	 *
+	 * @param string $path Absolute path to the directory containing block.json.
+	 * @return self
+	 */
+	public function block_json( string $path ): self {
+		$this->block_json_path = $path;
 		return $this;
 	}
 
@@ -360,6 +525,36 @@ class Enqueue {
 	 * @return void
 	 */
 	public function register(): void {
+		// block.json registration takes over completely — the handle/src/deps
+		// passed via the fluent API are ignored; block.json drives the assets.
+		if ( null !== $this->block_json_path ) {
+			\register_block_type_from_metadata( $this->block_json_path );
+			return;
+		}
+
+		// Block-editor scope: defer the rest of the flow to the editor hook.
+		if ( $this->for_block_editor ) {
+			add_action(
+				'enqueue_block_editor_assets',
+				function () {
+					$this->register_inner();
+				}
+			);
+			return;
+		}
+
+		$this->register_inner();
+	}
+
+	/**
+	 * Dispatches the registration to the script or style path.
+	 *
+	 * Extracted from register() so it can be re-entered from the
+	 * enqueue_block_editor_assets callback.
+	 *
+	 * @return void
+	 */
+	private function register_inner(): void {
 		if ( $this->type === 'script' ) {
 			$this->register_script();
 		}
@@ -375,20 +570,38 @@ class Enqueue {
 	 * @return void
 	 */
 	private function register_style() {
+		// Block-bound style: wp_enqueue_block_style() registers and attaches it
+		// to the named block, loads only when the block renders.
+		if ( null !== $this->block_name ) {
+			\wp_enqueue_block_style(
+				$this->block_name,
+				array(
+					'handle' => $this->handle,
+					'src'    => $this->src,
+					'deps'   => $this->deps,
+					'ver'    => $this->ver,
+					'media'  => $this->media,
+				)
+			);
+		} else {
+			\wp_register_style(
+				$this->handle,
+				$this->src,
+				$this->deps,
+				$this->ver,
+				$this->media
+			);
 
-		\wp_register_style(
-			$this->handle,
-			$this->src,
-			$this->deps,
-			$this->ver,
-			$this->media
-		);
-		if ( false === $this->for_block ) {
-			wp_enqueue_style( $this->handle );
+			if ( false === $this->for_block && false === $this->register_only ) {
+				wp_enqueue_style( $this->handle );
+			}
+		}
+
+		foreach ( $this->inline_styles as $css ) {
+			\wp_add_inline_style( $this->handle, $css );
 		}
 
 		$this->add_style_attributes();
-
 	}
 
 	/**
@@ -406,9 +619,29 @@ class Enqueue {
 			$this->footer
 		);
 
-		// Maybe add as an inline script.
+		// Script strategy (defer/async) via WP's dep-aware API.
+		if ( null !== $this->strategy ) {
+			\wp_script_add_data( $this->handle, 'strategy', $this->strategy );
+		}
+
+		// Script translations (i18n JSON lookup).
+		if ( null !== $this->translations ) {
+			\wp_set_script_translations(
+				$this->handle,
+				$this->translations['domain'],
+				$this->translations['path'] ?? ''
+			);
+		}
+
+		// Maybe add as an inline script (whole-file inline — legacy behaviour).
 		if ( $this->inline && $this->does_file_exist( $this->src ) ) {
-			\wp_add_inline_script( $this->handle, file_get_contents( $this->src ) ?: '' );
+			$contents = file_get_contents( $this->src );
+			\wp_add_inline_script( $this->handle, false !== $contents ? $contents : '' );
+		}
+
+		// Attach inline code snippets added via with_code().
+		foreach ( $this->inline_scripts as $snippet ) {
+			\wp_add_inline_script( $this->handle, $snippet['code'], $snippet['position'] );
 		}
 
 		// Localize all values if defined.
@@ -416,8 +649,8 @@ class Enqueue {
 			\wp_localize_script( $this->handle, $this->handle, $this->localize );
 		}
 
-		// Enqueue file if not used for a block.
-		if ( false === $this->for_block ) {
+		// Enqueue file if not used for a block / not register-only.
+		if ( false === $this->for_block && false === $this->register_only ) {
 			\wp_enqueue_script( $this->handle );
 		}
 
@@ -441,7 +674,7 @@ class Enqueue {
 		// Add to any scripts.
 		add_filter(
 			'script_loader_tag',
-			function( string $tag, string $handle, string $source ) use ( $attributes ): string {
+			function ( string $tag, string $handle, string $source ) use ( $attributes ): string {
 				// Bail if not our script.
 				if ( $this->handle !== $handle ) {
 					return $tag;
@@ -489,7 +722,7 @@ class Enqueue {
 		// Add to any relevant styles.
 		add_filter(
 			'style_loader_tag',
-			function( string $tag, string $handle, string $href, string $media ) use ( $attributes ): string {
+			function ( string $tag, string $handle, string $href, string $media ) use ( $attributes ): string {
 				// Bail if not our script.
 				if ( $this->handle !== $handle ) {
 					return $tag;
@@ -523,9 +756,9 @@ class Enqueue {
 	 *
 	 * @return string[]
 	 */
-	private function get_attributes():array {
+	private function get_attributes(): array {
 		return array_map(
-			function( string $key, ?string $value ): string {
+			function ( string $key, ?string $value ): string {
 				return null === $value
 					? "{$key}"
 					: "{$key}='{$value}'";
@@ -534,5 +767,4 @@ class Enqueue {
 			$this->attributes
 		);
 	}
-
 }
