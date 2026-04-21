@@ -125,54 +125,46 @@ class Test_Enqueue extends WP_UnitTestCase {
 
 	}
 
-	/** @testdox It should be possible to denote a scriptas async easily. */
+	/** @testdox It should be possible to denote a script as async easily. */
 	public function test_can_set_async_on_script(): void {
 		$script = self::create_script()->async();
 
-		$attributes = Objects::get_property( $script, 'attributes' );
-		$this->assertArrayHasKey( 'async', $attributes );
+		$this->assertSame( 'async', Objects::get_property( $script, 'strategy' ) );
 	}
 
 	/** @testdox It should be possible to denote a style as async easily. */
 	public function test_can_set_async_style(): void {
 		$style = self::create_style()->async();
 
-		$attributes = Objects::get_property( $style, 'attributes' );
-		$this->assertArrayHasKey( 'async', $attributes );
+		// async() sets the strategy flag regardless of type; wp_script_add_data
+		// on render is script-only, so on a style this is a harmless no-op.
+		$this->assertSame( 'async', Objects::get_property( $style, 'strategy' ) );
 	}
 
-	/** @testdox It should be possible to denote a scriptas defer easily. */
+	/** @testdox It should be possible to denote a script as defer easily. */
 	public function test_can_set_defer_on_script(): void {
 		$script = self::create_script()->defer();
 
-		$attributes = Objects::get_property( $script, 'attributes' );
-		$this->assertArrayHasKey( 'defer', $attributes );
+		$this->assertSame( 'defer', Objects::get_property( $script, 'strategy' ) );
 	}
 
 	/** @testdox It should be possible to denote a style as defer easily. */
 	public function test_can_set_defer_style(): void {
 		$style = self::create_style()->defer();
 
-		$attributes = Objects::get_property( $style, 'attributes' );
-		$this->assertArrayHasKey( 'defer', $attributes );
+		$this->assertSame( 'defer', Objects::get_property( $style, 'strategy' ) );
 	}
 
 	/** @testdox It should not be possible to set both async and defer, either should unset the other */
 	public function test_can_only_be_async_or_defer(): void {
-		$script     = self::create_script()->async();
-		$attributes = Objects::get_property( $script, 'attributes' );
-		$this->assertArrayHasKey( 'async', $attributes );
-		$this->assertArrayNotHasKey( 'defer', $attributes );
+		$script = self::create_script()->async();
+		$this->assertSame( 'async', Objects::get_property( $script, 'strategy' ) );
 
 		$script->defer();
-		$attributes = Objects::get_property( $script, 'attributes' );
-		$this->assertArrayHasKey( 'defer', $attributes );
-		$this->assertArrayNotHasKey( 'async', $attributes );
+		$this->assertSame( 'defer', Objects::get_property( $script, 'strategy' ) );
 
 		$script->async();
-		$attributes = Objects::get_property( $script, 'attributes' );
-		$this->assertArrayHasKey( 'async', $attributes );
-		$this->assertArrayNotHasKey( 'defer', $attributes );
+		$this->assertSame( 'async', Objects::get_property( $script, 'strategy' ) );
 	}
 
 	/** @testdox It should be possible to define if a script is added to the header */
@@ -226,12 +218,78 @@ class Test_Enqueue extends WP_UnitTestCase {
 
 	/** @testdox Calling the old, mistyped lastest_version() should throw deprecation notice. */
 	public function test_calling_old_latest_version_should_throw_deprecation_notice(): void {
-		try {
-			Enqueue::script('ff')->lastest_version();
-		} catch (\Throwable $th) {
-			$this->assertStringContainsString('Enqueue::lastest_version', $th->getMessage());
-			$this->assertStringContainsString('is deprecated', $th->getMessage());
-		}
+		$this->setExpectedDeprecated( 'PinkCrab\Enqueue\Enqueue::lastest_version' );
+		Enqueue::script( 'ff' )->src( 'https://example.test/js.js' )->lastest_version();
+	}
 
+	/** @testdox It should be possible to set script translations via translations(). */
+	public function test_can_set_translations(): void {
+		$script       = self::create_script()->translations( 'my-domain', '/path/to/translations' );
+		$translations = Objects::get_property( $script, 'translations' );
+		$this->assertSame( 'my-domain', $translations['domain'] );
+		$this->assertSame( '/path/to/translations', $translations['path'] );
+
+		// Path is optional.
+		$script       = self::create_script()->translations( 'just-domain' );
+		$translations = Objects::get_property( $script, 'translations' );
+		$this->assertSame( 'just-domain', $translations['domain'] );
+		$this->assertNull( $translations['path'] );
+	}
+
+	/** @testdox It should be possible to attach inline JS snippets via with_code() and have them accumulate. */
+	public function test_can_add_inline_code(): void {
+		$script = self::create_script()
+			->with_code( 'var foo = 1;' )
+			->with_code( 'var bar = 2;', 'before' );
+
+		$snippets = Objects::get_property( $script, 'inline_scripts' );
+		$this->assertCount( 2, $snippets );
+		$this->assertSame( 'var foo = 1;', $snippets[0]['code'] );
+		$this->assertSame( 'after', $snippets[0]['position'] );
+		$this->assertSame( 'var bar = 2;', $snippets[1]['code'] );
+		$this->assertSame( 'before', $snippets[1]['position'] );
+	}
+
+	/** @testdox It should be possible to attach inline CSS snippets via with_style() and have them accumulate. */
+	public function test_can_add_inline_style(): void {
+		$style = self::create_style()
+			->with_style( '.foo { color: red; }' )
+			->with_style( '.bar { color: blue; }' );
+
+		$snippets = Objects::get_property( $style, 'inline_styles' );
+		$this->assertCount( 2, $snippets );
+		$this->assertSame( '.foo { color: red; }', $snippets[0] );
+		$this->assertSame( '.bar { color: blue; }', $snippets[1] );
+	}
+
+	/** @testdox It should be possible to flag an asset for the block editor context. */
+	public function test_can_set_for_block_editor(): void {
+		$script = self::create_script()->for_block_editor();
+		$this->assertTrue( Objects::get_property( $script, 'for_block_editor' ) );
+
+		// Default arg is true; explicit false also works.
+		$script = self::create_script()->for_block_editor( false );
+		$this->assertFalse( Objects::get_property( $script, 'for_block_editor' ) );
+	}
+
+	/** @testdox It should be possible to attach a style to a named block via for_block_style(). */
+	public function test_can_set_for_block_style(): void {
+		$style = self::create_style()->for_block_style( 'my-plugin/my-block' );
+		$this->assertSame( 'my-plugin/my-block', Objects::get_property( $style, 'block_name' ) );
+	}
+
+	/** @testdox It should be possible to register without enqueueing via register_only(). */
+	public function test_can_set_register_only(): void {
+		$script = self::create_script()->register_only();
+		$this->assertTrue( Objects::get_property( $script, 'register_only' ) );
+
+		$script = self::create_script()->register_only( false );
+		$this->assertFalse( Objects::get_property( $script, 'register_only' ) );
+	}
+
+	/** @testdox It should be possible to point at a block.json directory via block_json(). */
+	public function test_can_set_block_json(): void {
+		$script = self::create_script()->block_json( '/path/to/block-dir' );
+		$this->assertSame( '/path/to/block-dir', Objects::get_property( $script, 'block_json_path' ) );
 	}
 }

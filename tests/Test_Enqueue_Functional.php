@@ -388,6 +388,351 @@ class Test_Enqueue_Functional extends \WP_UnitTestCase {
 		$this->assertArrayNotHasKey( 'script_loader_tag', $GLOBALS['wp_filter'] );
 	}
 
+	/** @testdox Calling defer() should register a 'defer' strategy via wp_script_add_data. */
+	public function test_defer_sets_strategy_data(): void {
+		Enqueue::script( 'script_defer' )
+			->src( 'https://url.com/Fixtures/defer.js' )
+			->ver( '1.0.0' )
+			->defer()
+			->register();
+
+		$this->assertArrayHasKey( 'script_defer', $GLOBALS['wp_scripts']->registered );
+		$this->assertSame( 'defer', $GLOBALS['wp_scripts']->registered['script_defer']->extra['strategy'] );
+	}
+
+	/** @testdox Calling async() should register an 'async' strategy via wp_script_add_data. */
+	public function test_async_sets_strategy_data(): void {
+		Enqueue::script( 'script_async' )
+			->src( 'https://url.com/Fixtures/async.js' )
+			->ver( '1.0.0' )
+			->async()
+			->register();
+
+		$this->assertArrayHasKey( 'script_async', $GLOBALS['wp_scripts']->registered );
+		$this->assertSame( 'async', $GLOBALS['wp_scripts']->registered['script_async']->extra['strategy'] );
+	}
+
+	/** @testdox translations() should register the handle for wp_set_script_translations. */
+	public function test_translations_registered_against_handle(): void {
+		Enqueue::script( 'script_i18n' )
+			->src( 'https://url.com/Fixtures/i18n.js' )
+			->ver( '1.0.0' )
+			->translations( 'pinkcrab-enqueue-test', '/tmp/translations' )
+			->register();
+
+		$this->assertArrayHasKey( 'script_i18n', $GLOBALS['wp_scripts']->registered );
+		$script = $GLOBALS['wp_scripts']->registered['script_i18n'];
+		$this->assertSame( 'pinkcrab-enqueue-test', $script->textdomain );
+		$this->assertSame( '/tmp/translations', $script->translations_path );
+	}
+
+	/** @testdox with_code() should attach inline snippets to the handle in the correct positions. */
+	public function test_with_code_attaches_inline_snippets(): void {
+		Enqueue::script( 'script_with_code' )
+			->src( 'https://url.com/Fixtures/with_code.js' )
+			->with_code( 'window.A = 1;' )
+			->with_code( 'window.B = 2;', 'before' )
+			->with_code( 'window.C = 3;', 'after' )
+			->register();
+
+		$script   = $GLOBALS['wp_scripts']->registered['script_with_code'];
+		$after    = is_array( $script->extra['after'] ) ? implode( "\n", $script->extra['after'] ) : $script->extra['after'];
+		$before   = is_array( $script->extra['before'] ) ? implode( "\n", $script->extra['before'] ) : $script->extra['before'];
+		$this->assertStringContainsString( 'window.A = 1;', $after );
+		$this->assertStringContainsString( 'window.C = 3;', $after );
+		$this->assertStringContainsString( 'window.B = 2;', $before );
+	}
+
+	/** @testdox with_style() should attach inline CSS to the style handle's 'after' slot. */
+	public function test_with_style_attaches_inline_css(): void {
+		Enqueue::style( 'style_with_css' )
+			->src( 'https://url.com/Fixtures/with_css.css' )
+			->with_style( '.foo { color: red; }' )
+			->with_style( '.bar { color: blue; }' )
+			->register();
+
+		$style     = $GLOBALS['wp_styles']->registered['style_with_css'];
+		$after_css = implode( "\n", $style->extra['after'] );
+		$this->assertStringContainsString( '.foo { color: red; }', $after_css );
+		$this->assertStringContainsString( '.bar { color: blue; }', $after_css );
+	}
+
+	/** @testdox register_only() should register the script without enqueueing it. */
+	public function test_register_only_script_does_not_enqueue(): void {
+		Enqueue::script( 'script_register_only' )
+			->src( 'https://url.com/Fixtures/register_only.js' )
+			->register_only()
+			->register();
+
+		$this->assertTrue( wp_script_is( 'script_register_only', 'registered' ) );
+		$this->assertFalse( wp_script_is( 'script_register_only', 'enqueued' ) );
+	}
+
+	/** @testdox register_only() should register the style without enqueueing it. */
+	public function test_register_only_style_does_not_enqueue(): void {
+		Enqueue::style( 'style_register_only' )
+			->src( 'https://url.com/Fixtures/register_only.css' )
+			->register_only()
+			->register();
+
+		$this->assertTrue( wp_style_is( 'style_register_only', 'registered' ) );
+		$this->assertFalse( wp_style_is( 'style_register_only', 'enqueued' ) );
+	}
+
+	/** @testdox for_block_editor() should defer the registration to the enqueue_block_editor_assets hook. */
+	public function test_for_block_editor_defers_to_editor_hook(): void {
+		Enqueue::script( 'script_block_editor' )
+			->src( 'https://url.com/Fixtures/block_editor.js' )
+			->for_block_editor()
+			->register();
+
+		// Before the hook fires, the script is NOT registered.
+		$this->assertFalse( wp_script_is( 'script_block_editor', 'registered' ) );
+
+		// Firing the editor hook should register + enqueue the script.
+		do_action( 'enqueue_block_editor_assets' );
+		$this->assertTrue( wp_script_is( 'script_block_editor', 'registered' ) );
+		$this->assertTrue( wp_script_is( 'script_block_editor', 'enqueued' ) );
+	}
+
+	/** @testdox for_block_style() should register the style and attach a render_block_{name} filter. */
+	public function test_for_block_style_attaches_to_block(): void {
+		// Block must be registered first for wp_enqueue_block_style to attach a filter to it.
+		\register_block_type(
+			'pinkcrab-enqueue/style-target',
+			array(
+				'api_version' => 3,
+				'title'       => 'Style Target',
+				'category'    => 'widgets',
+			)
+		);
+
+		Enqueue::style( 'block_bound_style' )
+			->src( 'https://url.com/Fixtures/block_bound.css' )
+			->ver( '1.0.0' )
+			->for_block_style( 'pinkcrab-enqueue/style-target' )
+			->register();
+
+		// wp_enqueue_block_style wires a deferred callback. Depending on the
+		// WP version and wp_should_load_block_assets_on_demand(), it lands on
+		// render_block, wp_enqueue_scripts/wp_footer, or enqueue_block_assets.
+		// Fire the full set to cover every branch.
+		apply_filters(
+			'render_block',
+			'<p>test</p>',
+			array(
+				'blockName'    => 'pinkcrab-enqueue/style-target',
+				'attrs'        => array(),
+				'innerBlocks'  => array(),
+				'innerHTML'    => '',
+				'innerContent' => array(),
+			),
+			null
+		);
+		do_action( 'wp_enqueue_scripts' );
+		do_action( 'wp_footer' );
+		do_action( 'enqueue_block_assets' );
+
+		$this->assertTrue( wp_style_is( 'block_bound_style', 'registered' ) );
+
+		\unregister_block_type( 'pinkcrab-enqueue/style-target' );
+	}
+
+	/** @testdox block_json() should register a block type from the block.json directory. */
+	public function test_block_json_registers_block_type(): void {
+		$block_dir = __DIR__ . '/Fixtures/test-block';
+
+		Enqueue::script( 'ignored_handle' )
+			->block_json( $block_dir )
+			->register();
+
+		$registry = \WP_Block_Type_Registry::get_instance();
+		$this->assertTrue( $registry->is_registered( 'pinkcrab-enqueue/test-block' ) );
+
+		$registry->unregister( 'pinkcrab-enqueue/test-block' );
+	}
+
+	/** @testdox latest_version() is a no-op when no src has been set. */
+	public function test_latest_version_no_op_when_src_empty(): void {
+		$script = Enqueue::script( 'no_src' )->latest_version();
+		$this->assertFalse( \Gin0115\WPUnit_Helpers\Objects::get_property( $script, 'ver' ) );
+	}
+
+	/** @testdox latest_version() bails when wp_remote_head returns a WP_Error. */
+	public function test_latest_version_bails_on_http_error(): void {
+		add_filter(
+			'pre_http_request',
+			static function () {
+				return new \WP_Error( 'http_request_failed', 'fake network fail' );
+			},
+			10,
+			3
+		);
+
+		$script = Enqueue::script( 'errored' )
+			->src( 'https://fake.example/script.js' )
+			->latest_version();
+
+		// ver stays at the default false (no timestamp parsed).
+		$this->assertFalse( \Gin0115\WPUnit_Helpers\Objects::get_property( $script, 'ver' ) );
+
+		remove_all_filters( 'pre_http_request' );
+	}
+
+	/** @testdox latest_version() bails when the remote returns a non-200 status. */
+	public function test_latest_version_bails_on_non_200(): void {
+		add_filter(
+			'pre_http_request',
+			static function () {
+				return array(
+					'headers'  => array(),
+					'body'     => '',
+					'response' => array(
+						'code'    => 404,
+						'message' => 'Not Found',
+					),
+					'cookies'  => array(),
+					'filename' => null,
+				);
+			},
+			10,
+			3
+		);
+
+		$script = Enqueue::script( 'missing' )
+			->src( 'https://fake.example/missing.js' )
+			->latest_version();
+
+		$this->assertFalse( \Gin0115\WPUnit_Helpers\Objects::get_property( $script, 'ver' ) );
+
+		remove_all_filters( 'pre_http_request' );
+	}
+
+	/** @testdox latest_version() parses a scalar Last-Modified header into a unix timestamp. */
+	public function test_latest_version_sets_ver_from_last_modified(): void {
+		$modified = 'Mon, 20 Apr 2026 12:34:56 GMT';
+		add_filter(
+			'pre_http_request',
+			static function () use ( $modified ) {
+				return array(
+					'headers'  => array( 'last-modified' => $modified ),
+					'body'     => '',
+					'response' => array(
+						'code'    => 200,
+						'message' => 'OK',
+					),
+					'cookies'  => array(),
+					'filename' => null,
+				);
+			},
+			10,
+			3
+		);
+
+		$script = Enqueue::script( 'latest' )
+			->src( 'https://fake.example/latest.js' )
+			->latest_version();
+
+		$this->assertSame( strtotime( $modified ), \Gin0115\WPUnit_Helpers\Objects::get_property( $script, 'ver' ) );
+
+		remove_all_filters( 'pre_http_request' );
+	}
+
+	/** @testdox latest_version() handles a Last-Modified header returned as an array (multi-valued). */
+	public function test_latest_version_handles_array_last_modified(): void {
+		$oldest = 'Mon, 01 Jan 2026 00:00:00 GMT';
+		$newest = 'Mon, 20 Apr 2026 12:34:56 GMT';
+		add_filter(
+			'pre_http_request',
+			static function () use ( $oldest, $newest ) {
+				return array(
+					'headers'  => array( 'last-modified' => array( $oldest, $newest ) ),
+					'body'     => '',
+					'response' => array(
+						'code'    => 200,
+						'message' => 'OK',
+					),
+					'cookies'  => array(),
+					'filename' => null,
+				);
+			},
+			10,
+			3
+		);
+
+		$script = Enqueue::script( 'latest_array' )
+			->src( 'https://fake.example/latest.js' )
+			->latest_version();
+
+		// end() picks the last entry — the newer timestamp.
+		$this->assertSame( strtotime( $newest ), \Gin0115\WPUnit_Helpers\Objects::get_property( $script, 'ver' ) );
+
+		remove_all_filters( 'pre_http_request' );
+	}
+
+	/** @testdox inline() does not attach file contents when the remote HEAD request fails (WP_Error). */
+	public function test_inline_skips_file_contents_on_http_error(): void {
+		add_filter(
+			'pre_http_request',
+			static function () {
+				return new \WP_Error( 'http_request_failed', 'fake network fail' );
+			},
+			10,
+			3
+		);
+
+		Enqueue::script( 'inline_errored' )
+			->src( 'https://fake.example/dead.js' )
+			->inline()
+			->register();
+
+		$script = $GLOBALS['wp_scripts']->registered['inline_errored'];
+		// No inline contents should have been attached.
+		$this->assertFalse( isset( $script->extra['after'] ) && ! empty( $script->extra['after'] ) );
+
+		remove_all_filters( 'pre_http_request' );
+	}
+
+	/** @testdox inline() attaches the file contents to the registered script when does_file_exist returns true. */
+	public function test_inline_attaches_file_contents_when_remote_exists(): void {
+		$body = 'console.log("inline-me");';
+		add_filter(
+			'pre_http_request',
+			static function () use ( $body ) {
+				return array(
+					'headers'  => array(),
+					'body'     => $body,
+					'response' => array(
+						'code'    => 200,
+						'message' => 'OK',
+					),
+					'cookies'  => array(),
+					'filename' => null,
+				);
+			},
+			10,
+			3
+		);
+
+		// Create a temp file locally because the legacy inline() path still
+		// uses file_get_contents(); the wp_remote_head does_file_exist check
+		// is the HTTP-mocked part.
+		$tmp = tempnam( sys_get_temp_dir(), 'pcenq' );
+		file_put_contents( $tmp, $body );
+
+		Enqueue::script( 'inline_file' )
+			->src( $tmp )
+			->inline()
+			->register();
+
+		$script = $GLOBALS['wp_scripts']->registered['inline_file'];
+		$after  = is_array( $script->extra['after'] ) ? implode( "\n", $script->extra['after'] ) : $script->extra['after'];
+		$this->assertStringContainsString( $body, $after );
+
+		unlink( $tmp );
+		remove_all_filters( 'pre_http_request' );
+	}
+
 	/** @testdox When registering a script, if the type is custom and manual id is added to attributes, it should not be auto generated. */
 	public function test_manual_id_added_to_attributes_if_custom_type_and_manual_id(): void {
 		// Enqueue

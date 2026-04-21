@@ -14,8 +14,7 @@
     "autoload": {
         "psr-4": {
             "PinkCrab\\Enqueue\\": "src"
-        },
-        "files": []
+        }
     },
     "autoload-dev": {
         "psr-4": {
@@ -23,32 +22,34 @@
         }
     },
     "require-dev": {
-        "phpunit/phpunit": "^7.0 || ^8.0",
-        "phpstan/phpstan": "1.*",
-        "szepeviktor/phpstan-wordpress": "<=1.1.7",
-        "php-stubs/wordpress-stubs": "6.* || 5.9.*",
-        "roots/wordpress": "6.1.*",
-        "wp-phpunit/wp-phpunit": "6.1.*",
-        "dealerdirect/phpcodesniffer-composer-installer": "<=1.0.0",
-        "wp-coding-standards/wpcs": "<=2.3.0",
-        "yoast/phpunit-polyfills": "^0.2.0 || ^1.0.0",
-        "symfony/var-dumper": "<=6.2.7",
-        "gin0115/wpunit-helpers": "1.1.*",
-        "vlucas/phpdotenv": "<=5.5.0",
-        "symfony/css-selector": "<=6.2.7",
-        "symfony/dom-crawler": "<=6.2.7",
-        "pinkcrab/function-constructors": "0.2.*"
+        "phpunit/phpunit": "^8.0 || ^9.0",
+        "phpstan/phpstan": "^2.0",
+        "szepeviktor/phpstan-wordpress": "^2.0",
+        "php-stubs/wordpress-stubs": "6.9.*",
+        "roots/wordpress": "6.9.*",
+        "wp-phpunit/wp-phpunit": "6.9.*",
+        "dealerdirect/phpcodesniffer-composer-installer": "*",
+        "wp-coding-standards/wpcs": "*",
+        "yoast/phpunit-polyfills": "^1.0.0 || ^2.0.0 || ^4.0.0",
+        "symfony/var-dumper": "*",
+        "gin0115/wpunit-helpers": "~1",
+        "vlucas/phpdotenv": "^5.4",
+        "symfony/css-selector": "*",
+        "symfony/dom-crawler": "*",
+        "pinkcrab/function-constructors": "^0.2"
     },
     "require": {
-        "php": ">=7.2.0"
+        "php": ">=8.0.0"
     },
     "scripts": {
-        "test": "phpunit --coverage-clover clover.xml --testdox",
-        "coverage": "phpunit --coverage-html coverage-report --testdox",
+        "test": "vendor/bin/phpunit --colors=always --testdox --coverage-clover clover.xml",
+        "coverage": "vendor/bin/phpunit --colors=always --testdox --coverage-html coverage-report --coverage-clover clover.xml",
         "analyse": "vendor/bin/phpstan analyse src -l8",
         "sniff": "./vendor/bin/phpcs src/ -v",
         "all": "composer test && composer analyse && composer sniff"
     },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "config": {
         "allow-plugins": {
             "roots/wordpress-core-installer": true,

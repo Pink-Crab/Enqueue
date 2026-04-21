@@ -71,3 +71,15 @@ define( 'WP_TESTS_TITLE', 'Test Blog' );
 define( 'WP_PHP_BINARY', 'php' );
 
 define( 'WPLANG', '' );
+
+// WP 6.8 emits an E_USER_NOTICE for wp_is_block_theme() being called too early
+// during tests. https://core.trac.wordpress.org/ticket/63086
+set_error_handler(
+	function ( $errno, $errstr ) {
+		if ( $errno === E_USER_NOTICE && strpos( $errstr, 'wp_is_block_theme' ) !== false ) {
+			return true;
+		}
+		return false;
+	},
+	E_USER_NOTICE
+);
