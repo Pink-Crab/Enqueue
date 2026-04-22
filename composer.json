@@ -36,7 +36,7 @@
         "vlucas/phpdotenv": "^5.4",
         "symfony/css-selector": "*",
         "symfony/dom-crawler": "*",
-        "pinkcrab/function-constructors": "^0.2"
+        "pinkcrab/function-constructors": "^0.2 || ^1.0"
     },
     "require": {
         "php": ">=8.0.0"
